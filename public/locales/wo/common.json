@@ -1,0 +1,194 @@
+{
+  "app": {
+    "name": "WattU",
+    "tagline": "Xibaaré. Topp. Soppi."
+  },
+  "nav": {
+    "home": "Kër",
+    "map": "Kàrt",
+    "report": "Xibaaré",
+    "settings": "Teraangay",
+    "submit_report": "Xibaaré ci problema",
+    "track_report": "Topp sama xibaaré",
+    "dashboard": "Tablo bu bés",
+    "reports": "Xibaaréyu",
+    "statistics": "Njiit",
+    "analytics": "Analis",
+    "export": "Génné",
+    "login": "Dugg",
+    "logout": "Génn"
+  },
+  "buttons": {
+    "submit": "Yónné",
+    "cancel": "Bàyyi",
+    "save": "Marle",
+    "delete": "Déglu",
+    "edit": "Soppi",
+    "search": "Seet",
+    "filter": "Tëjj",
+    "reset": "Dellussi",
+    "close": "Tëj",
+    "back": "Dellu",
+    "next": "Ci kanam",
+    "previous": "Ci ginnaaw",
+    "confirm": "Dëgëlante",
+    "view": "Gis",
+    "download": "Téléchargé"
+  },
+  "status": {
+    "pending": "Ci xar",
+    "in_progress": "Ci liggéey",
+    "resolved": "Defar",
+    "rejected": "Bàyyi"
+  },
+  "priority": {
+    "low": "Amul solo",
+    "normal": "Normal",
+    "high": "Am solo",
+    "urgent": "Dëgg na"
+  },
+  "login": {
+    "title": "Dugg",
+    "subtitle": "Kër yu yegg ñu agents ak admin",
+    "email": "Email",
+    "emailPlaceholder": "sa.email@exemple.com",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "••••••••",
+    "submit": "Duggatël",
+    "loading": "Doy dugg...",
+    "help": "Fatte nga sa mot de passe?",
+    "errors": {
+      "emailRequired": "Email a obligatoire",
+      "emailInvalid": "Format email xamuñu ko",
+      "passwordRequired": "Mot de passe a obligatoire",
+      "passwordMinLength": "Mot de passe bi dafay wara am 6 caractères",
+      "unexpected": "Am na ci njumte. Jëmalatël."
+    }
+  },
+  "dashboard": {
+    "logout": "Génn",
+    "version": "v1.0.0"
+  },
+  "footer": {
+    "rights": "Lépp droit réservé.",
+    "about": "Ci mbir",
+    "contact": "Jokkal"
+  },
+  "loading": "Doy indil...",
+  "error": "Am na njumte",
+  "success": "Liggéey bi baax na",
+  "no_data": "Amul benn dara",
+  "required": "Waroon na",
+  "optional": "Du waroon",
+  "language": "Làkk",
+  "home": {
+    "hero": {
+      "title": "Xibaaré problema yu sa dëkk",
+      "subtitle": "Ndimbal sa komiin ngir yàgg sa aaduna",
+      "cta": "Def xibaaré"
+    },
+    "quick": {
+      "report": {
+        "title": "Xibaaré bu bees",
+        "desc": "Xibaaré problema bu sa dëkk"
+      },
+      "map": {
+        "title": "Gis kàrt bi",
+        "desc": "Xool xibaaréyu sa dëkk"
+      }
+    },
+    "howto": {
+      "title": "Naka laay def?",
+      "step1": "Waxal problema bi",
+      "step2": "Yokk nataal",
+      "step3": "Bennal bëres bi",
+      "step4": "Sa komiin di wara liggeey"
+    }
+  },
+  "map": {
+    "title": "Kàrt xibaaréyu",
+    "count": "{{count}} xibaaré",
+    "loading": "Doy indil kàrt bi...",
+    "filters": "Tëjj",
+    "status_filter": "Etat",
+    "commune_filter": "Komiin",
+    "all_statuses": "Lépp etat",
+    "all_communes": "Lépp komiin",
+    "reset_filters": "Dellussi tëjj",
+    "retry": "Jëmalatël",
+    "selected_position": "Bëres bu tànn",
+    "placeholder": {
+      "title": "Kàrt bi interactive",
+      "desc": "Kàrt Leaflet dina am fii"
+    }
+  },
+  "signalement": {
+    "new": {
+      "title": "Xibaaré bu bees",
+      "subtitle": "Xibaaré problema bu sa dëkk"
+    },
+    "placeholder": {
+      "title": "Formulaire bu xibaaré",
+      "desc": "Formulaire bi dina am fii"
+    }
+  },
+  "settings": {
+    "title": "Teraangay",
+    "subtitle": "Soppi sa jàppale",
+    "language": {
+      "title": "Langue / Làkk"
+    },
+    "about": {
+      "title": "Ci mbir WattU",
+      "desc": "Plateforme bu nit ñi ngir soppi sa dëkk"
+    },
+    "contact": {
+      "title": "Jokkal"
+    }
+  },
+  "form": {
+    "type": "Xeetu problema",
+    "select_type": "Tànn xeetu problema",
+    "description": "Waxal problema bi",
+    "description_placeholder": "Waxal problema bi ci détail...",
+    "characters": "karakteru",
+    "photo": "Nataal",
+    "photo_desc": "Yokk nataal ngir wone problema bi",
+    "click_to_upload": "Cuutal ngir yokk nataal",
+    "compressing": "Doy diminu...",
+    "location": "Bëres bi",
+    "location_desc": "Jëfandikoo sa GPS walla cuutal ci kàrt bi",
+    "use_gps": "Jëfandikoo sama GPS",
+    "gps_loading": "Doy gis GPS...",
+    "or": "WALLA",
+    "click_map": "Cuutal ci kàrt bi ngir tànn bëres",
+    "gps_position": "Bëres GPS",
+    "manual_position": "Bëres bu tànn",
+    "commune": "Komiin",
+    "select_commune": "Tànn sa komiin",
+    "loading_communes": "Doy indil komiin...",
+    "phone": "Nimero telefon",
+    "name": "Sa tur",
+    "name_placeholder": "Amadou Diallo",
+    "submit": "Yónné xibaaré bi",
+    "submitting": "Doy yónné..."
+  },
+  "success": {
+    "report_submitted": "Xibaaré bi yónne na!",
+    "report_description": "Jërëjëf ci sa ndimbal! Sa xibaaré yónne na ko ci komiin bi.",
+    "report_id": "Référence",
+    "follow_up": "Man nga gis etat bu sa xibaaré ci kàrt bi.",
+    "view_map": "Gis kàrt bi",
+    "go_home": "Dellu ci kër",
+    "auto_redirect": "Redirection otomatik ci 5 segond..."
+  },
+  "errors": {
+    "type_required": "Xeetu problema waroon na",
+    "position_required": "Bëres GPS waroon na",
+    "commune_required": "Komiin waroon na",
+    "phone_required": "Nimero telefon waroon na",
+    "name_required": "Tur waroon na",
+    "submit_failed": "Am na ci njumte. Jëmalatël."
+  }
+}
+

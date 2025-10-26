@@ -1,0 +1,64 @@
+{
+  "title": "Xibaaré bu Nit",
+  "subtitle": "Dimmalinuleen ci soppi sa komiin",
+  "home": {
+    "title": "Dalal ak jam ci WattU",
+    "subtitle": "Xibaaré problema yi sa komiin am ak topp ñuy soppi ci wakhtul réel.",
+    "reportCTA": "Xibaaré ci problema",
+    "reportDescription": "Lëmbël, yoon bu wécc, set-setal... Xamleen!",
+    "createReport": "Defar xibaaré",
+    "howItWorks": "Naka mu dox?",
+    "step1Title": "1. Xibaaré",
+    "step1Description": "Wonewaat problema bi te yokk nataal ak berab.",
+    "step2Title": "2. Topp",
+    "step2Description": "Gis njëkk-njëkk bu sa xibaaré ci wakhtul réel.",
+    "step3Title": "3. Defar na!",
+    "step3Description": "Agents yu sa komiin defar nañu sa demande bi.",
+    "viewReportsCTA": "Gis xibaaréyu",
+    "viewReportsDescription": "Xamal problema yi xibaaré nañu ci sa komiin.",
+    "viewReports": "Gis xibaaréyu",
+    "mvpNotice": "MVP doy liggéey. Fonctionnalités yu tollu dañuy ñëw ci ganaaw.",
+    "comingSoon": "Fonctionnalité bi ci Stage 3 dina ñëw!"
+  },
+  "form": {
+    "type": "Dox bu problema bi",
+    "type_placeholder": "Tànnal benn dox",
+    "description": "Wonewaat",
+    "description_placeholder": "Wonewaat problema bi...",
+    "photo": "Nataal (du waroon)",
+    "photo_hint": "Yokk benn nataal ngir wone problema bi",
+    "location": "Berab",
+    "location_detect": "Jëfandikoo sama berab",
+    "location_manual": "Tànnal ci karte bi",
+    "commune": "Komiin",
+    "commune_placeholder": "Tànnal sa komiin",
+    "phone": "Nimero telefon (du waroon)",
+    "phone_placeholder": "+221 XX XXX XX XX",
+    "name": "Sa tur (du waroon)",
+    "name_placeholder": "Sa tur"
+  },
+  "types": {
+    "road": "Yoon bu wécc",
+    "lighting": "Lëmbël bu picc",
+    "waste": "Marse yu bon",
+    "water": "Problema bu ndox",
+    "electricity": "Problema bu kurant",
+    "other": "Beneen"
+  },
+  "tracking": {
+    "title": "Topp sama xibaaré",
+    "code_label": "Code bu topp",
+    "code_placeholder": "Duggal sa code bu 8 chiffres",
+    "search": "Seet",
+    "not_found": "Gisul xibaaré bi",
+    "status_title": "Njëkk-njëkk bu sa xibaaré"
+  },
+  "success": {
+    "title": "Xibaaré bi yónnee na!",
+    "message": "Sa xibaaré bi marle na ci baax.",
+    "code": "Sa code bu topp:",
+    "code_hint": "Marle code bii ngir topp sa xibaaré",
+    "copy": "Kopiyu code bi"
+  }
+}
+

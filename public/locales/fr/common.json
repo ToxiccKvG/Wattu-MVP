@@ -1,0 +1,139 @@
+{
+  "app": {
+    "name": "WattU",
+    "tagline": "Signaler. Suivre. Améliorer."
+  },
+  "nav": {
+    "home": "Accueil",
+    "map": "Carte",
+    "report": "Signaler",
+    "settings": "Paramètres",
+    "submit_report": "Signaler un problème",
+    "track_report": "Suivre mon signalement",
+    "dashboard": "Tableau de bord",
+    "reports": "Signalements",
+    "statistics": "Statistiques",
+    "analytics": "Analyses",
+    "export": "Exporter",
+    "login": "Connexion",
+    "logout": "Déconnexion"
+  },
+  "buttons": {
+    "submit": "Soumettre",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "reset": "Réinitialiser",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "confirm": "Confirmer",
+    "view": "Voir",
+    "download": "Télécharger"
+  },
+  "status": {
+    "pending": "En attente",
+    "in_progress": "En cours",
+    "resolved": "Résolu",
+    "rejected": "Rejeté"
+  },
+  "priority": {
+    "low": "Faible",
+    "normal": "Normal",
+    "high": "Élevée",
+    "urgent": "Urgent"
+  },
+  "login": {
+    "title": "Connexion",
+    "subtitle": "Espace réservé aux agents et administrateurs",
+    "email": "Email",
+    "emailPlaceholder": "votre.email@exemple.com",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "••••••••",
+    "submit": "Se connecter",
+    "loading": "Connexion en cours...",
+    "help": "Vous avez oublié votre mot de passe ?",
+    "errors": {
+      "emailRequired": "L'email est obligatoire",
+      "emailInvalid": "Format d'email invalide",
+      "passwordRequired": "Le mot de passe est obligatoire",
+      "passwordMinLength": "Le mot de passe doit contenir au moins 6 caractères",
+      "unexpected": "Une erreur est survenue. Veuillez réessayer."
+    }
+  },
+  "dashboard": {
+    "logout": "Déconnexion",
+    "version": "v1.0.0"
+  },
+  "footer": {
+    "rights": "Tous droits réservés.",
+    "about": "À propos",
+    "contact": "Contact"
+  },
+  "loading": "Chargement...",
+  "error": "Une erreur s'est produite",
+  "success": "Opération réussie",
+  "no_data": "Aucune donnée disponible",
+  "required": "Champ obligatoire",
+  "optional": "Optionnel",
+  "language": "Langue",
+  "home": {
+    "hero": {
+      "title": "Signalez les problèmes de votre ville",
+      "subtitle": "Aidez votre commune à améliorer votre quotidien",
+      "cta": "Faire un signalement"
+    },
+    "quick": {
+      "report": {
+        "title": "Nouveau signalement",
+        "desc": "Signalez un problème dans votre ville"
+      },
+      "map": {
+        "title": "Voir la carte",
+        "desc": "Découvrez les signalements de votre ville"
+      }
+    },
+    "howto": {
+      "title": "Comment ça marche ?",
+      "step1": "Décrivez le problème",
+      "step2": "Ajoutez une photo",
+      "step3": "Indiquez l'emplacement",
+      "step4": "Votre commune s'en occupe"
+    }
+  },
+  "map": {
+    "placeholder": {
+      "title": "Carte Interactive",
+      "desc": "La carte Leaflet sera intégrée ici"
+    }
+  },
+  "signalement": {
+    "new": {
+      "title": "Nouveau signalement",
+      "subtitle": "Signalez un problème dans votre ville"
+    },
+    "placeholder": {
+      "title": "Formulaire de signalement",
+      "desc": "Le formulaire sera intégré ici"
+    }
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Personnalisez votre expérience",
+    "language": {
+      "title": "Langue / Làkk"
+    },
+    "about": {
+      "title": "À propos de WattU",
+      "desc": "Plateforme de signalement citoyen pour améliorer votre ville"
+    },
+    "contact": {
+      "title": "Contact"
+    }
+  }
+}
+

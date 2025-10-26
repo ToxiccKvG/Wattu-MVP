@@ -1,0 +1,132 @@
+{
+  "dashboard": {
+    "welcome": "Bienvenue",
+    "subtitle": "Tableau de bord - Gestion des signalements de votre commune",
+    "stats": {
+      "pending": "En attente",
+      "in_progress": "En cours",
+      "resolved": "Résolus",
+      "rejected": "Rejetés",
+      "pending_subtitle": "Signalements à traiter",
+      "in_progress_subtitle": "En traitement",
+      "resolved_subtitle": "Problèmes traités",
+      "rejected_subtitle": "Hors périmètre"
+    },
+    "recent_reports": "Signalements récents",
+    "view_all": "Voir tous",
+    "no_reports": "Aucun signalement récent"
+  },
+  "reports": {
+    "title": "Signalements",
+    "subtitle": "Tous les signalements de votre commune",
+    "filters": {
+      "title": "Filtres",
+      "type": "Type",
+      "status": "Statut",
+      "priority": "Priorité",
+      "date_from": "Date de début",
+      "date_to": "Date de fin",
+      "all_types": "Tous les types",
+      "all_statuses": "Tous les statuts",
+      "all_priorities": "Toutes les priorités",
+      "pick_date": "Sélectionner une date",
+      "reset": "Réinitialiser les filtres",
+      "active": "filtre actif",
+      "active_plural": "filtres actifs",
+      "clear": "Effacer"
+    },
+    "list": {
+      "count": "signalement trouvé",
+      "count_plural": "signalements trouvés",
+      "empty": "Aucun signalement trouvé",
+      "empty_with_filters": "Essayez de modifier les filtres pour voir plus de résultats.",
+      "empty_no_filters": "Aucun signalement disponible pour votre commune."
+    },
+    "export": {
+      "button": "Exporter CSV",
+      "exporting": "Export...",
+      "success": "Export réussi",
+      "error": "Erreur lors de l'export"
+    },
+    "detail": {
+      "back": "Retour à la liste",
+      "description": "Description",
+      "no_description": "Aucune description",
+      "photo": "Photo du signalement",
+      "location": "Localisation",
+      "coordinates": "Coordonnées",
+      "information": "Informations",
+      "created_at": "Date de création",
+      "reported_by": "Signalé par",
+      "phone": "Téléphone",
+      "not_found": "Signalement introuvable",
+      "access_denied": "Accès non autorisé à ce signalement",
+      "loading_error": "Erreur lors du chargement du signalement"
+    }
+  },
+  "status": {
+    "pending": "En attente",
+    "in_progress": "En cours",
+    "resolved": "Résolu",
+    "rejected": "Rejeté",
+    "update": {
+      "title": "Gérer le statut",
+      "current": "Statut actuel",
+      "new": "Nouveau statut",
+      "select": "Sélectionnez un statut",
+      "submit": "Mettre à jour le statut",
+      "updating": "Mise à jour en cours...",
+      "success": "Statut mis à jour avec succès !",
+      "error": "Erreur lors de la mise à jour du statut",
+      "no_transition": "Ce signalement est dans un état final. Aucune transition de statut n'est possible.",
+      "allowed_transitions": "Transitions autorisées"
+    }
+  },
+  "priority": {
+    "urgent": "Urgent",
+    "high": "Élevée",
+    "normal": "Normal",
+    "low": "Faible",
+    "update": {
+      "title": "Gérer la priorité",
+      "current": "Priorité actuelle",
+      "new": "Nouvelle priorité",
+      "select": "Sélectionnez une priorité",
+      "submit": "Mettre à jour la priorité",
+      "updating": "Mise à jour en cours...",
+      "success": "Priorité mise à jour avec succès !",
+      "error": "Erreur lors de la mise à jour de la priorité",
+      "help": "Évaluez la priorité en fonction de la gravité et de l'urgence du problème"
+    }
+  },
+  "report_types": {
+    "road": "Voirie",
+    "lighting": "Éclairage public",
+    "water": "Problème d'eau",
+    "waste": "Déchets/Salubrité",
+    "security": "Sécurité",
+    "other": "Autre"
+  },
+  "navigation": {
+    "dashboard": "Tableau de bord",
+    "reports": "Signalements",
+    "logout": "Déconnexion"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "details": "Détails",
+    "close": "Fermer",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "actions": "Actions"
+  }
+}

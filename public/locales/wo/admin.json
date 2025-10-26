@@ -1,0 +1,87 @@
+{
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "reports": "Signalements",
+    "analytics": "Analytiques",
+    "export": "Export"
+  },
+  "layout": {
+    "admin_space": "Espace Admin",
+    "role_admin": "Administrateur",
+    "logout": "Déconnexion"
+  },
+  "dashboard": {
+    "title": "Tableau de bord Admin",
+    "subtitle": "Vue d'ensemble de la plateforme WattU",
+    "refresh": "Actualiser",
+    "footer": "Les données sont mises à jour en temps réel. Dernière actualisation:"
+  },
+  "stats": {
+    "total": "Total Signalements",
+    "pending": "En Attente",
+    "in_progress": "En Cours",
+    "resolved": "Résolus",
+    "rejected": "Rejetés"
+  },
+  "top_communes": {
+    "title": "Top 5 Communes",
+    "subtitle": "Classées par volume de signalements",
+    "no_data": "Aucune donnée disponible",
+    "reports": "signalements",
+    "pending": "attente",
+    "in_progress": "cours",
+    "resolved": "résolus"
+  },
+  "trends": {
+    "title": "Évolution des signalements",
+    "subtitle": "30 derniers jours",
+    "no_data": "Aucune donnée disponible",
+    "reports": "Signalements"
+  },
+  "reports": {
+    "title": "Tous les Signalements",
+    "subtitle": "Gérer tous les signalements de toutes les communes",
+    "filters": "Filtres",
+    "export": "Exporter CSV",
+    "no_reports": "Aucun signalement trouvé"
+  },
+  "report_table": {
+    "no_reports": "Aucun signalement trouvé",
+    "id": "ID",
+    "commune": "Commune",
+    "type": "Type",
+    "status": "Statut",
+    "priority": "Priorité",
+    "date": "Date",
+    "actions": "Actions",
+    "view": "Voir"
+  },
+  "filters": {
+    "communes": "Communes",
+    "all_communes": "Toutes les communes",
+    "types": "Types",
+    "all_types": "Tous les types",
+    "statuses": "Statuts",
+    "all_statuses": "Tous les statuts",
+    "priority": "Priorité",
+    "all_priorities": "Toutes les priorités",
+    "date_from": "Du",
+    "date_to": "Au",
+    "reset": "Réinitialiser",
+    "apply": "Appliquer"
+  },
+  "export": {
+    "title": "Exporter les données",
+    "subtitle": "Configurer et télécharger un export CSV",
+    "format": "Format",
+    "csv": "CSV",
+    "pdf": "PDF (bientôt)",
+    "columns": "Colonnes à exporter",
+    "select_all": "Tout sélectionner",
+    "deselect_all": "Tout désélectionner",
+    "preview": "Aperçu",
+    "preview_text": "{{count}} signalements seront exportés",
+    "download": "Télécharger",
+    "cancel": "Annuler"
+  }
+}

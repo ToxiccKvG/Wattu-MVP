@@ -1,0 +1,132 @@
+{
+  "dashboard": {
+    "welcome": "Dalal jam",
+    "subtitle": "Tablo bord - Gestion signalement ci commun bi",
+    "stats": {
+      "pending": "Ci xaar",
+      "in_progress": "Dafa ci seen",
+      "resolved": "Dafa réglé",
+      "rejected": "Dafa bañ",
+      "pending_subtitle": "Signalement yu war a jëfandikoo",
+      "in_progress_subtitle": "Dafa ci traitement",
+      "resolved_subtitle": "Problème yi réglé",
+      "rejected_subtitle": "Xaare périmètre"
+    },
+    "recent_reports": "Signalement yu mujj",
+    "view_all": "Xool lep",
+    "no_reports": "Amul signalement bu mujj"
+  },
+  "reports": {
+    "title": "Signalement yi",
+    "subtitle": "Signalement lépp ci commun bi",
+    "filters": {
+      "title": "Filtre yi",
+      "type": "Mbind",
+      "status": "Yoon",
+      "priority": "Priorité",
+      "date_from": "Date bu njëkk",
+      "date_to": "Date bu jeex",
+      "all_types": "Mbind yépp",
+      "all_statuses": "Yoon yépp",
+      "all_priorities": "Priorité yépp",
+      "pick_date": "Tann date",
+      "reset": "Dellu filtre yi",
+      "active": "filtre bu dëgg",
+      "active_plural": "filtre yu dëgg",
+      "clear": "Dindi"
+    },
+    "list": {
+      "count": "signalement gis",
+      "count_plural": "signalement yu gis",
+      "empty": "Gisul signalement",
+      "empty_with_filters": "Jëkko filtre yi ngir gis wuuté.",
+      "empty_no_filters": "Amul signalement ci commun bi."
+    },
+    "export": {
+      "button": "Yobbante CSV",
+      "exporting": "Dafa yobbante...",
+      "success": "Yobbante réussi",
+      "error": "Njumte ci yobbante"
+    },
+    "detail": {
+      "back": "Dellu ci liste bi",
+      "description": "Teuré",
+      "no_description": "Amul teuré",
+      "photo": "Nataal signalement bi",
+      "location": "Nëbou",
+      "coordinates": "Coordonnées",
+      "information": "Xibaar",
+      "created_at": "Date ci am",
+      "reported_by": "Signalé ku",
+      "phone": "Telefon",
+      "not_found": "Gisul signalement",
+      "access_denied": "Mën la wuute ci signalement bii",
+      "loading_error": "Njumte ci chargement signalement"
+    }
+  },
+  "status": {
+    "pending": "Ci xaar",
+    "in_progress": "Dafa ci seen",
+    "resolved": "Dafa réglé",
+    "rejected": "Dafa bañ",
+    "update": {
+      "title": "Gérer yoon bi",
+      "current": "Yoon bu leegi",
+      "new": "Yoon bu bees",
+      "select": "Tann yoon",
+      "submit": "Yobbante yoon bi",
+      "updating": "Dafa yobbante...",
+      "success": "Yoon bi yobbante ci dox!",
+      "error": "Njumte ci yobbante yoon bi",
+      "no_transition": "Signalement bii dafa ci etat bu jeex. Transition yoon amul.",
+      "allowed_transitions": "Transition yu mën"
+    }
+  },
+  "priority": {
+    "urgent": "Urgent",
+    "high": "Rafet",
+    "normal": "Normal",
+    "low": "Gudd",
+    "update": {
+      "title": "Gérer priorité bi",
+      "current": "Priorité bu leegi",
+      "new": "Priorité bu bees",
+      "select": "Tann priorité",
+      "submit": "Yobbante priorité bi",
+      "updating": "Dafa yobbante...",
+      "success": "Priorité bi yobbante ci dox!",
+      "error": "Njumte ci yobbante priorité bi",
+      "help": "Teg priorité bi ci grave ak urgent bi"
+    }
+  },
+  "report_types": {
+    "road": "Yoon",
+    "lighting": "Lumière bu bees",
+    "water": "Problème ndox",
+    "waste": "Njumeent/Salubrité",
+    "security": "Sécurité",
+    "other": "Beneen"
+  },
+  "navigation": {
+    "dashboard": "Tablo bord",
+    "reports": "Signalement yi",
+    "logout": "Génn"
+  },
+  "common": {
+    "loading": "Dafa charge...",
+    "error": "Njumte",
+    "success": "Réussi",
+    "cancel": "Bañ",
+    "confirm": "Dëgg",
+    "save": "Saax",
+    "delete": "Digg",
+    "edit": "Jëkko",
+    "view": "Xool",
+    "details": "Xibaar",
+    "close": "Tëj",
+    "search": "Seet",
+    "filter": "Filtre",
+    "sort": "Rang",
+    "actions": "Liggéey"
+  }
+}

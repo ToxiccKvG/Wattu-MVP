@@ -1,0 +1,64 @@
+{
+  "title": "Signalement Citoyen",
+  "subtitle": "Aidez-nous à améliorer votre commune",
+  "home": {
+    "title": "Bienvenue sur WattU",
+    "subtitle": "Signalez les problèmes de votre commune et suivez leur résolution en temps réel.",
+    "reportCTA": "Signaler un problème",
+    "reportDescription": "Éclairage public, route dégradée, propreté... Faites-nous savoir !",
+    "createReport": "Créer un signalement",
+    "howItWorks": "Comment ça marche ?",
+    "step1Title": "1. Signalez",
+    "step1Description": "Décrivez le problème et ajoutez une photo avec localisation.",
+    "step2Title": "2. Suivez",
+    "step2Description": "Consultez le statut de votre signalement en temps réel.",
+    "step3Title": "3. C'est résolu !",
+    "step3Description": "Les agents de votre commune traitent votre demande.",
+    "viewReportsCTA": "Consulter les signalements",
+    "viewReportsDescription": "Découvrez les problèmes signalés dans votre commune.",
+    "viewReports": "Voir les signalements",
+    "mvpNotice": "MVP en cours de développement. Les fonctionnalités complètes seront disponibles prochainement.",
+    "comingSoon": "Fonctionnalité à venir dans Stage 3 !"
+  },
+  "form": {
+    "type": "Type de problème",
+    "type_placeholder": "Sélectionnez un type",
+    "description": "Description",
+    "description_placeholder": "Décrivez le problème en détail...",
+    "photo": "Photo (optionnel)",
+    "photo_hint": "Ajoutez une photo pour illustrer le problème",
+    "location": "Localisation",
+    "location_detect": "Utiliser ma position",
+    "location_manual": "Sélectionner sur la carte",
+    "commune": "Commune",
+    "commune_placeholder": "Sélectionnez votre commune",
+    "phone": "Numéro de téléphone (optionnel)",
+    "phone_placeholder": "+221 XX XXX XX XX",
+    "name": "Votre nom (optionnel)",
+    "name_placeholder": "Votre nom"
+  },
+  "types": {
+    "road": "Route endommagée",
+    "lighting": "Éclairage public",
+    "waste": "Gestion des déchets",
+    "water": "Problème d'eau",
+    "electricity": "Problème électrique",
+    "other": "Autre"
+  },
+  "tracking": {
+    "title": "Suivre mon signalement",
+    "code_label": "Code de suivi",
+    "code_placeholder": "Entrez votre code à 8 caractères",
+    "search": "Rechercher",
+    "not_found": "Signalement introuvable",
+    "status_title": "Statut de votre signalement"
+  },
+  "success": {
+    "title": "Signalement envoyé !",
+    "message": "Votre signalement a été enregistré avec succès.",
+    "code": "Votre code de suivi :",
+    "code_hint": "Conservez ce code pour suivre votre signalement",
+    "copy": "Copier le code"
+  }
+}
+

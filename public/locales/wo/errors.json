@@ -1,0 +1,35 @@
+{
+  "auth": {
+    "invalid_credentials": "Email walla mot de passe baaxul",
+    "session_expired": "Sa session bi wóor na. Dugg koh ci kanam.",
+    "unauthorized": "Amul droit bu dugg ci xët bii",
+    "login_failed": "Dugg bi baaxul. Jéemale."
+  },
+  "network": {
+    "offline": "Amul connexion. Xool sa internet.",
+    "timeout": "Requête bi gudde na lool. Jéemale.",
+    "server_error": "Problema bu serveur. Jéemale ci kanam."
+  },
+  "form": {
+    "required_field": "Waroon na ci fii",
+    "invalid_email": "Email baaxul",
+    "invalid_phone": "Nimero telefon baaxul",
+    "file_too_large": "Fichier bi gëna mag (max 5MB)",
+    "invalid_file_type": "Doxu fichier bu jàppul"
+  },
+  "report": {
+    "submit_failed": "Yónné xibaaré bi baaxul",
+    "not_found": "Gisul xibaaré bi",
+    "update_failed": "Soppi bi baaxul"
+  },
+  "location": {
+    "permission_denied": "Droit bu localisation bayyi",
+    "unavailable": "Localisation amul",
+    "timeout": "Gëstu localisation bi wóor"
+  },
+  "general": {
+    "unknown_error": "Am na njumte bu xam-xamul",
+    "try_again": "Jéemale"
+  }
+}
+

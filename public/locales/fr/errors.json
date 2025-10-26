@@ -1,0 +1,35 @@
+{
+  "auth": {
+    "invalid_credentials": "Email ou mot de passe incorrect",
+    "session_expired": "Votre session a expiré. Veuillez vous reconnecter.",
+    "unauthorized": "Vous n'êtes pas autorisé à accéder à cette page",
+    "login_failed": "Échec de la connexion. Veuillez réessayer."
+  },
+  "network": {
+    "offline": "Vous êtes hors ligne. Vérifiez votre connexion internet.",
+    "timeout": "La requête a pris trop de temps. Veuillez réessayer.",
+    "server_error": "Erreur serveur. Veuillez réessayer plus tard."
+  },
+  "form": {
+    "required_field": "Ce champ est obligatoire",
+    "invalid_email": "Email invalide",
+    "invalid_phone": "Numéro de téléphone invalide",
+    "file_too_large": "Le fichier est trop volumineux (max 5MB)",
+    "invalid_file_type": "Type de fichier non supporté"
+  },
+  "report": {
+    "submit_failed": "Échec de l'envoi du signalement",
+    "not_found": "Signalement introuvable",
+    "update_failed": "Échec de la mise à jour"
+  },
+  "location": {
+    "permission_denied": "Permission de localisation refusée",
+    "unavailable": "Localisation indisponible",
+    "timeout": "Temps de localisation écoulé"
+  },
+  "general": {
+    "unknown_error": "Une erreur inconnue s'est produite",
+    "try_again": "Veuillez réessayer"
+  }
+}
+
