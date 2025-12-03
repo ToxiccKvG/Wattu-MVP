@@ -38,6 +38,55 @@
     "no_data": "Aucune donnée disponible",
     "reports": "Signalements"
   },
+  "analytics": {
+    "title": "Analytics",
+    "subtitle": "Analys statistique lépp ci plateforme bi",
+    "period": {
+      "7d": "Fan 7 yi mujj",
+      "30d": "Fan 30 yi mujj",
+      "90d": "Fan 90 yi mujj",
+      "all": "Lépp"
+    },
+    "by_type": {
+      "title": "Répartition ci mbind"
+    },
+    "by_status": {
+      "title": "Répartition ci yoon"
+    },
+    "by_priority": {
+      "title": "Répartition ci priorité"
+    },
+    "by_commune": {
+      "title": "Répartition ci commun",
+      "subtitle": "Top 10 commun yi"
+    },
+    "no_data": "Amul donnée",
+    "error": "Njumte ci chargement analytics"
+  },
+  "status": {
+    "pending": "Ci xaar",
+    "in_progress": "Dafa ci seen",
+    "resolved": "Dafa réglé",
+    "rejected": "Dafa bañ"
+  },
+  "priority": {
+    "low": "Gudd",
+    "normal": "Normal",
+    "high": "Rafet",
+    "urgent": "Urgent"
+  },
+  "report_types": {
+    "road": "Yoon",
+    "lighting": "Lumière bu bees",
+    "water": "Problème ndox",
+    "waste": "Njumeent/Salubrité",
+    "security": "Sécurité",
+    "health": "Sante",
+    "electricity": "Kër gi",
+    "sanitation": "Assainissement",
+    "green_spaces": "Bët bi",
+    "other": "Beneen"
+  },
   "reports": {
     "title": "Tous les Signalements",
     "subtitle": "Gérer tous les signalements de toutes les communes",

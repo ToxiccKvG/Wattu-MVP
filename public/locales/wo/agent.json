@@ -99,6 +99,28 @@
       "help": "Teg priorité bi ci grave ak urgent bi"
     }
   },
+  "report": {
+    "types": {
+      "voirie": "Yoon",
+      "eclairage": "Lumière bu bees",
+      "eau": "Ndox",
+      "proprete": "Soxna / Njumeent",
+      "securite": "Sécurité",
+      "sante": "Sante",
+      "electricite": "Kër gi",
+      "assainissement": "Assainissement",
+      "espaces_verts": "Bët bi",
+      "autre": "Beneen"
+    }
+  },
+  "type": {
+    "current": "Mbind bu leegi",
+    "new": "Mbind bu bees",
+    "select": "Tann mbind",
+    "update": "Yokk mbind bi",
+    "updating": "Dafa yokk...",
+    "same": "Mbind bi nga tann dafa mel ni mbind bu leegi"
+  },
   "report_types": {
     "road": "Yoon",
     "lighting": "Lumière bu bees",
@@ -110,7 +132,33 @@
   "navigation": {
     "dashboard": "Tablo bord",
     "reports": "Signalement yi",
+    "trends": "Tendances",
     "logout": "Génn"
+  },
+  "trends": {
+    "title": "Tendances",
+    "subtitle": "Analys statistique signalement yi ci commun bi",
+    "period": {
+      "7d": "Fan 7 yi mujj",
+      "30d": "Fan 30 yi mujj",
+      "90d": "Fan 90 yi mujj",
+      "all": "Lépp"
+    },
+    "over_time": {
+      "title": "Yokk signalement yi"
+    },
+    "by_type": {
+      "title": "Répartition ci mbind"
+    },
+    "by_status": {
+      "title": "Répartition ci yoon"
+    },
+    "by_priority": {
+      "title": "Répartition ci priorité"
+    },
+    "reports": "Signalement yi",
+    "no_data": "Amul donnée",
+    "error": "Njumte ci chargement tendances"
   },
   "common": {
     "loading": "Dafa charge...",

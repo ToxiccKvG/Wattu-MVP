@@ -7,6 +7,7 @@
     "home": "Kër",
     "map": "Kàrt",
     "report": "Xibaaré",
+    "my_reports": "Sama xibaaréyu",
     "settings": "Teraangay",
     "submit_report": "Xibaaré ci problema",
     "track_report": "Topp sama xibaaré",
@@ -47,6 +48,37 @@
     "high": "Am solo",
     "urgent": "Dëgg na"
   },
+  "form": {
+    "type": "Xeetu problema",
+    "select_type": "Tànn xeetu problema",
+    "description": "Waxal problema bi",
+    "description_placeholder": "Waxal problema bi ci détail...",
+    "characters": "karakteru",
+    "photo": "Nataal",
+    "photo_desc": "Yokk nataal ngir wone problema bi",
+    "click_to_upload": "Cuutal ngir yokk nataal",
+    "compressing": "Doy yombal...",
+    "remove_photo": "Dindi nataal bi",
+    "location": "Bëres bi",
+    "location_desc": "Jëfandikoo sa GPS walla cuutal ci kàrt bi",
+    "use_gps": "Jëfandikoo sama GPS",
+    "gps_loading": "Doy gis GPS...",
+    "or": "WALLA",
+    "click_map": "Cuutal ci kàrt bi ngir tànn bëres",
+    "gps_position": "Bëres GPS",
+    "manual_position": "Bëres bu tànn",
+    "commune": "Komiin",
+    "select_commune": "Tànn sa komiin",
+    "loading_communes": "Doy indil komiin...",
+    "phone": "Nimero telefon",
+    "name": "Sa tur",
+    "name_placeholder": "Amadou Diallo",
+    "email": "Email (su fekkee la neexe)",
+    "address": "Bëres (su fekkee la neexe)",
+    "address_placeholder": "Rue, quartier, wallu ndigal...",
+    "submit": "Yónné xibaaré bi",
+    "submitting": "Doy yónné..."
+  },
   "login": {
     "title": "Dugg",
     "subtitle": "Kër yu yegg ñu agents ak admin",
@@ -64,6 +96,104 @@
       "passwordMinLength": "Mot de passe bi dafay wara am 6 caractères",
       "unexpected": "Am na ci njumte. Jëmalatël."
     }
+  },
+  "oauth": {
+    "separator": "WALLA",
+    "google": {
+      "button": "Duggatël ci Google",
+      "loading": "Doy dugg...",
+      "error": "Njumte ci duggatël ci Google"
+    },
+    "callback": {
+      "processing": "Doy dugg...",
+      "success": "Duggatël bi baax na!",
+      "redirecting": "Doy dellu...",
+      "completingProfile": "Doy tëral sa profil...",
+      "error": "Njumte ci duggatël",
+      "errorMessage": "Man naa duggatël",
+      "backToLogin": "Dellu ci duggatël",
+      "backToWelcome": "Dellu ci duggatël"
+    },
+    "completeProfile": {
+      "title": "Tëral sa profil",
+      "description": "Am na ci xam-xam bu bees bu waroon ngir tëral sa duggatël.",
+      "age": "At",
+      "agePlaceholder": "Sa at",
+      "commune": "Komiin",
+      "communePlaceholder": "Tànn sa komiin",
+      "phone": "Nimero telefon",
+      "phonePlaceholder": "Sa numero telefon",
+      "submit": "Jëm ci kanam",
+      "submitting": "Doy yebal...",
+      "success": "Profil bi tëral na!",
+      "errors": {
+        "ageRequired": "At waroon na (1-120)",
+        "communeRequired": "Komiin waroon na",
+        "phoneRequired": "Nimero telefon waroon na",
+        "formInvalid": "Dafay wara jëmalatël ci formulaire bi.",
+        "unexpected": "Am na ci njumte. Jëmalatël."
+      }
+    }
+  },
+  "signup": {
+    "firstName": "Tur bu njëkk",
+    "firstNamePlaceholder": "Sa tur bu njëkk",
+    "lastName": "Tur bu gannaaw",
+    "lastNamePlaceholder": "Sa tur bu gannaaw",
+    "age": "At",
+    "agePlaceholder": "Sa at",
+    "commune": "Komiin",
+    "communePlaceholder": "Tànn sa komiin",
+    "phone": "Nimero telefon",
+    "phonePlaceholder": "Sa numero telefon",
+    "address": "Bëres",
+    "addressPlaceholder": "Sa bëres bu yépp",
+    "email": "Email",
+    "emailPlaceholder": "sa.email@exemple.com",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "••••••••",
+    "submit": "Duggatël",
+    "submitting": "Doy duggatël...",
+    "success": {
+      "emailSent": "Email bu confirmation yónne na. Xoolal sa boîte mail."
+    },
+    "errors": {
+      "firstNameRequired": "Tur bu njëkk waroon na",
+      "lastNameRequired": "Tur bu gannaaw waroon na",
+      "ageRequired": "At waroon na (1-120)",
+      "communeRequired": "Komiin waroon na",
+      "phoneRequired": "Nimero telefon waroon na",
+      "addressRequired": "Bëres waroon na",
+      "emailRequired": "Email waroon na",
+      "emailInvalid": "Format email xamuñu ko",
+      "passwordRequired": "Mot de passe waroon na",
+      "passwordMinLength": "Mot de passe bi dafay wara am 6 caractères",
+      "unexpected": "Am na ci njumte. Jëmalatël."
+    }
+  },
+  "emailConfirmation": {
+    "processing": "Doy confirm sa email...",
+    "success": "Email bi confirm na!",
+    "redirecting": "Doy dellu ci duggatël...",
+    "error": "Njumte ci confirmation",
+    "backToLogin": "Dellu ci duggatël",
+    "errors": {
+      "noToken": "Token bu confirmation amul dara",
+      "invalidToken": "Token bu confirmation xamuñu ko walla a expiré",
+      "unexpected": "Am na ci njumte ci confirmation"
+    }
+  },
+  "welcome": {
+    "title": "Bëng ci WattU",
+    "subtitle": "Def sa compte ngir xibaaré problema yu sa dëkk",
+    "signupTitle": "Def compte",
+    "signupSubtitle": "Tànn sa yoon bu defar compte",
+    "alreadyHaveAccount": "Am na nga compte?",
+    "loginLink": "Duggatël",
+    "version": "v1.0.0",
+    "voiceOption": "Mën nga it defar ci agent IA",
+    "voiceOptionDesc": "Agent IA bi dina la laaj ci kàddu, yaw dina ko tontu ci kàddu",
+    "startVoiceSignup": "Tàmbalee defar ci kàddu"
   },
   "dashboard": {
     "logout": "Génn",
@@ -95,6 +225,10 @@
       "map": {
         "title": "Gis kàrt bi",
         "desc": "Xool xibaaréyu sa dëkk"
+      },
+      "dashboard": {
+        "title": "Sama xibaaréyu",
+        "desc": "Xoolal taariix bu sama xibaaréyu"
       }
     },
     "howto": {
@@ -135,6 +269,25 @@
   "settings": {
     "title": "Teraangay",
     "subtitle": "Soppi sa jàppale",
+    "account": {
+      "title": "Sama compte",
+      "name": "Tur",
+      "name_placeholder": "Sa tur bu mat",
+      "email": "Email",
+      "commune": "Komiin",
+      "phone": "Nimero telefon",
+      "phone_placeholder": "Bulo war a tekki",
+      "notAvailable": "Amul dara",
+      "edit": "Soppi",
+      "save": "Dëgëlante soppi yi",
+      "save_success": "Profil bi yees na",
+      "save_error": "Njumte ci soppi profil bi"
+    },
+    "logout": {
+      "button": "Génn",
+      "success": "Génn bi baax na",
+      "error": "Njumte ci génn"
+    },
     "language": {
       "title": "Langue / Làkk"
     },
@@ -146,40 +299,235 @@
       "title": "Jokkal"
     }
   },
-  "form": {
-    "type": "Xeetu problema",
-    "select_type": "Tànn xeetu problema",
-    "description": "Waxal problema bi",
-    "description_placeholder": "Waxal problema bi ci détail...",
-    "characters": "karakteru",
+  "voice": {
+    "recording_title": "Jëflante ci kàddu",
+    "max_duration": "ci {{seconds}}s",
+    "start_recording": "Jëflante",
+    "re_record": "Defaat jëflante bi",
+    "stop_recording": "Taxawal",
+    "reset": "Dellusi",
+    "not_supported": "Manul",
+    "analysis_in_progress": "Analise IA mi ngi ci yoon...",
+    "analysis_hint": "Mi ngi génn catégorie, bëres ak infomasyon yu am solo.",
+    "analysis_error_title": "Analise manul",
+    "analysis_error_desc": "Jëmalatël walla bind xibaaré yi ci loxo.",
+    "detected_category": "Catégorie bu ñu xam",
+    "confidence": "Wóor",
+    "severity": "Dëgg-dëgg"
+  },
+  "citizen": {
+    "dashboard": {
+      "title": "Sama signalements",
+      "subtitle": "Xoolal taariix ak statut bu sama signalements",
+      "stats_title": "Statistiques",
+      "reports_title": "Taariix",
+      "not_authenticated": "War nga jëkk seet",
+      "load_error": "Njumte ci indil",
+      "error": "Njumte",
+      "filter": {
+        "all": "Yépp",
+        "pending": "Mi ngi xaar",
+        "in_progress": "Mi ngi ci yoon",
+        "resolved": "Yeesal"
+      }
+    },
+    "stats": {
+      "total": "Yépp",
+      "pending": "Mi ngi xaar",
+      "in_progress": "Mi ngi ci yoon",
+      "resolved": "Yeesal",
+      "rejected": "Déglu"
+    },
+    "reports": {
+      "empty": "Amul signalement",
+      "empty_desc": "Defaruloo signalement.",
+      "error": "Njumte ci indil",
+      "has_audio": "Kàddu",
+      "has_photo": "Nataal"
+    },
+    "report_detail": {
+      "title": "Détails bu xibaaré bi",
+      "description": "Waxal",
     "photo": "Nataal",
-    "photo_desc": "Yokk nataal ngir wone problema bi",
-    "click_to_upload": "Cuutal ngir yokk nataal",
-    "compressing": "Doy diminu...",
-    "location": "Bëres bi",
-    "location_desc": "Jëfandikoo sa GPS walla cuutal ci kàrt bi",
-    "use_gps": "Jëfandikoo sama GPS",
-    "gps_loading": "Doy gis GPS...",
-    "or": "WALLA",
-    "click_map": "Cuutal ci kàrt bi ngir tànn bëres",
-    "gps_position": "Bëres GPS",
-    "manual_position": "Bëres bu tànn",
+      "photo_alt": "Nataal bu xibaaré bi",
+      "audio": "Kàddu bu bind",
+      "audio_not_supported": "Sa navigator du ko jëfandikoo.",
+      "informations": "Xibaar",
+      "created_at": "Bés bu defar",
+      "commune": "Komiin",
+      "location": "Bëres GPS",
+      "load_error": "Njumte ci indil",
+      "error": "Njumte"
+    }
+  },
+  "notifications": {
+    "title": "Xibaar yi",
+    "empty": "Amul xibaar ci léegi",
+    "markAsRead": "Téené ko lu jàng",
+    "markAllRead": "Téené lépp lu jàng",
+    "remove": "Jóbb",
+    "clearAll": "Jóbb lépp",
+    "title.statusChange": "Yokk ci statut bi",
+    "status": {
+      "pending": "Ci natt",
+      "in_progress": "Ci liggéey",
+      "resolved": "Yéppal",
+      "rejected": "Bañ"
+    },
+    "message": {
+      "pending": "Signalement bi nga génne jëkk nañu ko gis te ci natt la.",
+      "in_progress": "Signalement bi nga génne ci liggéey la léegi.",
+      "resolved": "Signalement bi nga génne yéppal na !",
+      "rejected": "Signalement bi nga génne bañ nañu ko.",
+      "unknown": "Statut bi ci signalement bi nga génne yékkati na."
+    },
+    "time": {
+      "justNow": "Ci léegi",
+      "minutesAgo": "{{count}} minut ci gannaaw",
+      "minutesAgo_plural": "{{count}} minut ci gannaaw",
+      "hoursAgo": "{{count}} waxtu ci gannaaw",
+      "hoursAgo_plural": "{{count}} waxtu ci gannaaw",
+      "daysAgo": "{{count}} bés ci gannaaw",
+      "daysAgo_plural": "{{count}} bés ci gannaaw"
+    }
+  },
+  "audio": {
+    "noAudio": "Amul audio bu bind",
+    "error": "Njumte ci dégg audio bi",
+    "playError": "Manuma ko dégg",
+    "play": "Dégg",
+    "pause": "Dëgg",
+    "seek": "Bëj-saalum dégg bi",
+    "volume": "Volume",
+    "mute": "Tëj volume bi",
+    "unmute": "Ubbi volume bi"
+  },
+  "locationCard": {
+    "status": {
+      "idle": {
+        "label": "GPS bi mi ngi xaar la",
+        "description": "Nuy xaar nga tàmbali jëflante bi ngir jël sa bëres."
+      },
+      "searching": {
+        "label": "Mi ngi seet sa bëres…",
+        "description": "Dencal benn segond, nu ngi jël sa bëres otomatik."
+      },
+      "success": {
+        "label": "Bëres bi am na",
+        "description": "Dëgëral walla soppi ci kaw kàrt bi."
+      },
+      "error": {
+        "label": "Manunoo jël bëres bi",
+        "description": "Jëmalatël walla tànn sa bëres ci kàrt bi."
+      },
+      "denied": {
+        "label": "Joxeel GPS bi takkuma ko",
+        "description": "Joxal ndiggal walla tànn bëres bi ci kàrt bi."
+      },
+      "timeout": {
+        "label": "GPS bi dafa yagg",
+        "description": "Jëmalatël walla tànn bëres bi ak loxo."
+      }
+    },
+    "elapsed": "{{count}}s weesu na",
+    "coordinates": "Lat {{lat}} · Lon {{lng}}",
+    "accuracy": "Dëgg-dëgg ~ {{meters}} m",
+    "confirmed": "Dëgëral",
+    "waiting": "Mi ngi xaar coordonnées GPS…",
+    "actions": {
+      "confirm": "Dëgëlante bëres bii",
+      "manual": "Soppi ci kàrt bi",
+      "retry": "Jëmalatël GPS"
+    }
+  },
+  "photo_sheet": {
+    "title": "Tàkk nataal",
+    "description": "Tàkk nataal ngir wone problema bi (du waroon)",
+    "select_photo": "Cuutal ngir jël nataal",
+    "remove_photo": "Déglu nataal bi",
+    "confirm": "Dëgëlante nataal bi",
+    "skip": "Bàyyi bii",
+    "skip_no_photo": "Jëm ci kanam bàyyi nataal"
+  },
+  "voiceSignup": {
+    "title": "Defar ci kàddu",
+    "ready": "Nuy wut",
+    "readyDesc": "Agent IA bi dina la laaj ci kàddu",
+    "loading": "Doy indil...",
+    "progress": "Laaj {{current}} ci {{total}}",
+    "agentSpeaking": "Agent bi di wax...",
+    "listening": "Damaa déglu...",
+    "processing": "Doy liggéey...",
+    "generating": "Agent bi mi ngi waajal baatam...",
+    "controls": {
+      "cancel": "Bàyyi",
+      "retry": "Jëmalatël",
+      "repeat": "Waxaat laaj bi",
+      "manual": "Bind ci loxo",
+      "previous": "Ci ginnaaw",
+      "next": "Ci kanam",
+      "toolbar": "Tëj bu defar ci kàddu"
+    },
+    "error": {
+      "notSupported": "Fonctionnalité bi manul",
+      "notSupportedDesc": "Sa navigateur bi manul déglu kàddu.",
+      "permissionDenied": "Joxeewu microphone",
+      "permissionDeniedDesc": "Joxal jëfandikoo microphone ci teraangay sa navigateur.",
+      "recognitionFailed": "Manuma ko dégg. Mën nga ko waxaat?",
+      "retryLimit": "Manuma ko dégg ci ñaari yoon. Cuutal \"Waxaat\" walla bind ci loxo.",
+      "accountCreation": "Njumte ci defar compte bi"
+    },
+    "success": {
+      "accountCreated": "Compte bi defar na!"
+    },
+    "summary": {
+      "title": "Xoolal xam-xam yi",
+      "subtitle": "Xoolal ak soppi bu la war",
+      "firstName": "Tur bu jëkk",
+      "lastName": "Tur bu mag",
+      "age": "At",
     "commune": "Komiin",
-    "select_commune": "Tànn sa komiin",
-    "loading_communes": "Doy indil komiin...",
+      "selectCommune": "Tànn komiin",
     "phone": "Nimero telefon",
-    "name": "Sa tur",
-    "name_placeholder": "Amadou Diallo",
-    "submit": "Yónné xibaaré bi",
-    "submitting": "Doy yónné..."
+      "address": "Bëres",
+      "email": "Email",
+      "confirm": "Dëgëlante ak defar sama compte",
+      "creating": "Doy defar...",
+      "back": "Dellu",
+      "cancel": "Bàyyi",
+      "errors": {
+        "nameRequired": "Bii dafay wara am (min 2 xaraf)",
+        "ageInvalid": "At bi du mel (1-120)",
+        "communeRequired": "Komiin waroon na",
+        "phoneInvalid": "Nimero bi du mel (9 xaraf)",
+        "emailInvalid": "Format email du mel",
+        "addressRequired": "Bëres bi du mel (min 5 xaraf)"
+      },
+      "editField": "Soppi {{field}}"
+    }
+  },
+  "report": {
+    "type_section_title": "Lan la nga di xibaare ?"
+  },
+  "report_types": {
+    "voirie": "Yoon / dalal yoon",
+    "eclairage": "Làmpu yoon",
+    "eau": "Ndox",
+    "dechets": "Njàlbeen / Set-setal",
+    "securite": "Kaarange",
+    "assainissement": "Sànitation",
+    "espaces_verts": "Parc ak garab",
+    "transport": "Transport",
+    "autre": "Beneen probleem"
   },
   "success": {
     "report_submitted": "Xibaaré bi yónne na!",
     "report_description": "Jërëjëf ci sa ndimbal! Sa xibaaré yónne na ko ci komiin bi.",
     "report_id": "Référence",
     "follow_up": "Man nga gis etat bu sa xibaaré ci kàrt bi.",
-    "view_map": "Gis kàrt bi",
-    "go_home": "Dellu ci kër",
+    "view_map": "Kàrt",
+    "view_dashboard": "Gis sama signalements",
+    "go_home": "Kër",
     "auto_redirect": "Redirection otomatik ci 5 segond..."
   },
   "errors": {
@@ -189,6 +537,47 @@
     "phone_required": "Nimero telefon waroon na",
     "name_required": "Tur waroon na",
     "submit_failed": "Am na ci njumte. Jëmalatël."
+  },
+  "voiceAuth": {
+    "enroll": {
+      "title": "Defar ci kàddu",
+      "instruction": "Wax sa tur ak sa tur bu jëkk",
+      "example": "Mëneel: \"Sama tur Ousmane Dafara\"",
+      "recording": "Dafay jàllè...",
+      "processing": "Dafay xool sa baat...",
+      "confirm": "Dëgëlante sa tur",
+      "name": "Tur",
+      "prenom": "Tur bu jëkk",
+      "namePlaceholder": "Sa tur",
+      "prenomPlaceholder": "Sa tur bu jëkk",
+      "confirmButton": "Dëgëlante",
+      "retry": "Waxaat",
+      "saving": "Dafay defar compte bi...",
+      "success": "Defar na!",
+      "errors": {
+        "recordingFailed": "Njumte ci jàllè",
+        "transcriptionFailed": "Manuma ko dégg. Bind ci loxo sa tur.",
+        "nameExtractionFailed": "Manuma ko gis sa tur. Bind ci loxo.",
+        "enrollmentFailed": "Njumte ci defar. Waxaat.",
+        "microphoneDenied": "Manuma gis mikrofon. Jox ko ci teraangay."
+      }
+    },
+    "verify": {
+      "title": "Dëgëlante sa baat",
+      "instruction": "Waxaat sa tur ngir dëgëlante",
+      "recording": "Dafay jàllè...",
+      "processing": "Dafay xool sa baat...",
+      "confirmButton": "Dëgëlante",
+      "retry": "Waxaat",
+      "success": "Baat bi gis na!",
+      "redirecting": "Dafay dellu...",
+      "errors": {
+        "recordingFailed": "Njumte ci jàllè",
+        "verificationFailed": "Njumte ci xool. Waxaat.",
+        "voiceNotRecognized": "Baat bi gisuma. Waxaat.",
+        "userNotFound": "Gisuma ko. Defar dëmb.",
+        "microphoneDenied": "Manuma gis mikrofon. Jox ko ci teraangay."
+      }
+    }
   }
 }
-

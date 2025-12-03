@@ -36,19 +36,19 @@ function LoginForm() {
   // ═══════════════════════════════════════════════════════════
   // HOOKS
   // ═══════════════════════════════════════════════════════════
-  
+
   const { t } = useTranslation();
   const { login } = useAuth();
 
   // ═══════════════════════════════════════════════════════════
   // ÉTAT LOCAL
   // ═══════════════════════════════════════════════════════════
-  
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   // Erreurs de validation spécifiques aux champs
   const [emailError, setEmailError] = useState(null);
   const [passwordError, setPasswordError] = useState(null);
@@ -64,12 +64,12 @@ function LoginForm() {
     if (!value.trim()) {
       return t('login.errors.emailRequired', { defaultValue: 'L\'email est obligatoire' });
     }
-    
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(value)) {
       return t('login.errors.emailInvalid', { defaultValue: 'Format d\'email invalide' });
     }
-    
+
     return null;
   };
 
@@ -80,11 +80,11 @@ function LoginForm() {
     if (!value) {
       return t('login.errors.passwordRequired', { defaultValue: 'Le mot de passe est obligatoire' });
     }
-    
+
     if (value.length < 6) {
       return t('login.errors.passwordMinLength', { defaultValue: 'Le mot de passe doit contenir au moins 6 caractères' });
     }
-    
+
     return null;
   };
 
@@ -94,10 +94,10 @@ function LoginForm() {
   const validateForm = () => {
     const emailErr = validateEmail(email);
     const passwordErr = validatePassword(password);
-    
+
     setEmailError(emailErr);
     setPasswordError(passwordErr);
-    
+
     return !emailErr && !passwordErr;
   };
 
@@ -130,29 +130,29 @@ function LoginForm() {
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Nettoyer les erreurs précédentes
     setError(null);
     setEmailError(null);
     setPasswordError(null);
-    
+
     // Validation côté client
     if (!validateForm()) {
       return;
     }
-    
+
     try {
       setLoading(true);
-      
+
       // Appel AuthContext.login() (qui gère redirection automatique)
       const result = await login(email.trim(), password, 'fr');
-      
+
       if (!result.success) {
         // Afficher l'erreur sécurisée (filtrée par authService)
         setError(result.error);
       }
       // Si succès, la redirection est automatique (gérée par AuthContext)
-      
+
     } catch (err) {
       // Erreur inattendue (normalement déjà gérée par authService)
       setError(t('login.errors.unexpected', { defaultValue: 'Une erreur est survenue. Veuillez réessayer.' }));

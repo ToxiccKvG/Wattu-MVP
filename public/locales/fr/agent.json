@@ -99,6 +99,28 @@
       "help": "Évaluez la priorité en fonction de la gravité et de l'urgence du problème"
     }
   },
+  "report": {
+    "types": {
+      "voirie": "Voirie",
+      "eclairage": "Éclairage public",
+      "eau": "Eau",
+      "proprete": "Propreté / Déchets",
+      "securite": "Sécurité",
+      "sante": "Santé",
+      "electricite": "Électricité",
+      "assainissement": "Assainissement",
+      "espaces_verts": "Espaces verts",
+      "autre": "Autre"
+    }
+  },
+  "type": {
+    "current": "Type actuel",
+    "new": "Nouveau type",
+    "select": "Sélectionner un type",
+    "update": "Mettre à jour le type",
+    "updating": "Mise à jour...",
+    "same": "Le type sélectionné est identique au type actuel"
+  },
   "report_types": {
     "road": "Voirie",
     "lighting": "Éclairage public",
@@ -110,7 +132,33 @@
   "navigation": {
     "dashboard": "Tableau de bord",
     "reports": "Signalements",
+    "trends": "Tendances",
     "logout": "Déconnexion"
+  },
+  "trends": {
+    "title": "Tendances",
+    "subtitle": "Analyse statistique des signalements de votre commune",
+    "period": {
+      "7d": "7 derniers jours",
+      "30d": "30 derniers jours",
+      "90d": "90 derniers jours",
+      "all": "Tout"
+    },
+    "over_time": {
+      "title": "Évolution des signalements"
+    },
+    "by_type": {
+      "title": "Répartition par type"
+    },
+    "by_status": {
+      "title": "Répartition par statut"
+    },
+    "by_priority": {
+      "title": "Répartition par priorité"
+    },
+    "reports": "Signalements",
+    "no_data": "Aucune donnée disponible",
+    "error": "Erreur lors du chargement des tendances"
   },
   "common": {
     "loading": "Chargement...",

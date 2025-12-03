@@ -12,6 +12,8 @@ import {
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import useCommunes from '@/hooks/useCommunes';
+import { Card, CardContent } from '@/components/ui/card';
+import { useAuth } from '@/context/AuthContext';
 import * as reportService from '@/services/reportService';
 
 /**
@@ -26,7 +28,8 @@ import * as reportService from '@/services/reportService';
 function CitizenMap() {
   const { t } = useTranslation('common');
   const { communes, loading: communesLoading } = useCommunes();
-  
+  const { user, getVoiceUser, isVoiceAuthenticated } = useAuth();
+
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -36,10 +39,22 @@ function CitizenMap() {
   const [communeFilter, setCommuneFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
+  // Déterminer l'utilisateur courant (Supabase OU voice)
+  const voiceUser = getVoiceUser();
+  const isVoice = isVoiceAuthenticated();
+  const userId = isVoice ? voiceUser?.id : user?.id;
+
   /**
    * Récupérer les signalements
    */
   const fetchReports = useCallback(async () => {
+    if (!userId) {
+      setLoading(false);
+      setReports([]);
+      setError(null);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -48,7 +63,7 @@ function CitizenMap() {
       if (statusFilter) options.status = statusFilter;
       if (communeFilter) options.commune_id = communeFilter;
 
-      const result = await reportService.getAllReports(options);
+      const result = await reportService.getCitizenReports(userId, options);
 
       if (result.error) {
         setError(result.error.message);
@@ -61,7 +76,7 @@ function CitizenMap() {
     } finally {
       setLoading(false);
     }
-  }, [statusFilter, communeFilter]);
+  }, [userId, statusFilter, communeFilter]);
 
   // Charger les signalements au montage et quand les filtres changent
   useEffect(() => {
@@ -80,6 +95,21 @@ function CitizenMap() {
   const mapCenter = reports.length > 0
     ? { lat: reports[0].latitude, lng: reports[0].longitude }
     : { lat: 14.6928, lng: -17.4467 };
+
+  // Si l'utilisateur n'est pas authentifié (ni Supabase ni voice)
+  if (!user && !isVoice) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Card>
+          <CardContent className="p-6">
+            <p className="text-center text-neutral-600">
+              {t('citizen.dashboard.not_authenticated', { defaultValue: 'Vous devez être connecté' })}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

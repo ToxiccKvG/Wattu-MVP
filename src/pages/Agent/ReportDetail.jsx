@@ -11,11 +11,13 @@ import StatusBadge from '@/components/reports/StatusBadge';
 import PriorityBadge from '@/components/reports/PriorityBadge';
 import StatusUpdateForm from '@/components/reports/StatusUpdateForm';
 import PriorityUpdateForm from '@/components/reports/PriorityUpdateForm';
+import TypeUpdateForm from '@/components/reports/TypeUpdateForm';
+import AudioPlayer from '@/components/shared/AudioPlayer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Loader2, ArrowLeft, MapPin, Calendar, User, Phone, Image as ImageIcon } from 'lucide-react';
+import { Loader2, ArrowLeft, MapPin, Calendar, User, Phone, Image as ImageIcon, Mic } from 'lucide-react';
 
 // Fix Leaflet default marker icon
 delete L.Icon.Default.prototype._getIconUrl;
@@ -163,6 +165,33 @@ function ReportDetail() {
   };
 
   /**
+   * Mettre à jour le type
+   */
+  const handleUpdateType = async (newType) => {
+    try {
+      setUpdating(true);
+      console.log(`⚡ Mise à jour type: ${newType}`);
+
+      const { data, error: updateError } = await reportApi.updateReportType(id, newType);
+
+      if (updateError) {
+        toast.error(`Erreur: ${updateError.message}`);
+        return;
+      }
+
+      setReport(data);
+      toast.success('Type mis à jour avec succès !');
+      console.log('✅ Type mis à jour');
+
+    } catch (err) {
+      console.error('❌ Erreur update type:', err);
+      toast.error('Erreur lors de la mise à jour du type');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  /**
    * Retour à la liste
    */
   const handleBack = () => {
@@ -247,15 +276,32 @@ function ReportDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* COLONNE GAUCHE : Détails */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Description */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Description</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-neutral-700">{report.description || 'Aucune description'}</p>
-            </CardContent>
-          </Card>
+          {/* Audio ou Description */}
+          {report.audio_url ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Mic className="w-5 h-5" />
+                  Enregistrement audio
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AudioPlayer audioUrl={report.audio_url} />
+                <p className="text-xs text-neutral-500 mt-3">
+                  Écoutez l'enregistrement pour comprendre le problème signalé
+                </p>
+              </CardContent>
+            </Card>
+          ) : report.description ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Description</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-neutral-700">{report.description}</p>
+              </CardContent>
+            </Card>
+          ) : null}
 
           {/* Photo du signalement */}
           {report.image_url && (
@@ -406,6 +452,20 @@ function ReportDetail() {
               <PriorityUpdateForm
                 currentPriority={report.priority}
                 onSubmit={handleUpdatePriority}
+                loading={updating}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Mise à jour du type (surtout utile pour les signalements vocaux) */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Gérer le type</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TypeUpdateForm
+                currentType={report.type}
+                onSubmit={handleUpdateType}
                 loading={updating}
               />
             </CardContent>

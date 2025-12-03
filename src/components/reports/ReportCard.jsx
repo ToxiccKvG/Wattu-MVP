@@ -60,7 +60,7 @@ function ReportCard({ report, onViewDetails, className = '' }) {
    * Tronquer la description (max 100 caractères)
    */
   const truncateDescription = (text, maxLength = 100) => {
-    if (!text) return 'Aucune description';
+    if (!text) return null;
     if (text.length <= maxLength) return text;
     return `${text.substring(0, maxLength)}...`;
   };
@@ -108,9 +108,11 @@ function ReportCard({ report, onViewDetails, className = '' }) {
                 <h3 className="font-semibold text-lg text-neutral-900 capitalize">
                   {report.type?.replace('_', ' ') || 'Type inconnu'}
                 </h3>
-                <p className="text-sm text-neutral-600 line-clamp-2">
-                  {truncateDescription(report.description)}
-                </p>
+                {truncateDescription(report.description) && (
+                  <p className="text-sm text-neutral-600 line-clamp-2">
+                    {truncateDescription(report.description)}
+                  </p>
+                )}
               </div>
 
               {/* Badges */}

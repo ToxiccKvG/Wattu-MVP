@@ -42,7 +42,6 @@ function Login() {
 
   /**
    * Effet 1 : Forcer le français
-   * Login est réservé aux agents/admins → Français uniquement
    */
   useEffect(() => {
     forceLanguage('fr');
@@ -52,14 +51,27 @@ function Login() {
    * Effet 2 : Rediriger si déjà connecté
    * 
    * Si user déjà authentifié, le rediriger vers son dashboard
-   * - Agent → /agent/dashboard
    * - Admin → /admin/dashboard
+   * - Agent → /agent/dashboard
+   * - Citizen → /home (redirigé vers /welcome car cette page est pour agents/admins)
    */
   useEffect(() => {
     if (isAuthenticated && userRole) {
-      const redirectPath = userRole === 'admin' 
-        ? '/admin/dashboard' 
-        : '/agent/dashboard';
+      if (userRole === 'citizen') {
+        // Les citoyens ne devraient pas être sur cette page
+        navigate('/home', { replace: true });
+        return;
+      }
+      
+      let redirectPath;
+      if (userRole === 'admin') {
+        redirectPath = '/admin/dashboard';
+      } else if (userRole === 'agent') {
+        redirectPath = '/agent/dashboard';
+      } else {
+        // Rôle inconnu, ne pas rediriger
+        return;
+      }
       
       navigate(redirectPath, { replace: true });
     }

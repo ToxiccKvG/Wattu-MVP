@@ -43,12 +43,12 @@ function AdminLayout() {
       icon: FileText,
       label: t('nav.reports', { defaultValue: 'Signalements' })
     },
-    // Note: Analytics et Export seront implémentés plus tard (post-MVP)
-    // {
-    //   to: '/admin/analytics',
-    //   icon: BarChart3,
-    //   label: t('nav.analytics', { defaultValue: 'Analytiques' })
-    // },
+    {
+      to: '/admin/analytics',
+      icon: BarChart3,
+      label: t('nav.analytics', { defaultValue: 'Analytics' })
+    },
+    // Note: Export sera implémenté plus tard (post-MVP)
     // {
     //   to: '/admin/export',
     //   icon: Download,

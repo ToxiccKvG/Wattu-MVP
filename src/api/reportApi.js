@@ -70,6 +70,7 @@ export async function createReport(reportData) {
           audio_url: reportData.audio_url || null,
           phone: reportData.phone || null,
           citizen_name: reportData.citizen_name || null,
+          citizen_user_id: reportData.citizen_user_id || null,
           // status et priority sont auto-définis (default DB)
           // code_suivi reste NULL (pas de tracking pour MVP)
         }
@@ -236,6 +237,92 @@ export async function getReportById(id) {
 
   } catch (err) {
     console.error('❌ Erreur inattendue getReportById:', err);
+    return {
+      data: null,
+      error: {
+        message: err.message || 'Erreur inattendue',
+        code: 'UNEXPECTED_ERROR'
+      }
+    };
+  }
+}
+
+/**
+ * Récupérer tous les signalements d'un citoyen
+ * 
+ * @param {string} userId - UUID de l'utilisateur citoyen
+ * @param {Object} [options] - Options de filtrage
+ * @param {string} [options.status] - Filtrer par statut
+ * @param {string} [options.commune_id] - Filtrer par commune (UUID)
+ * @param {number} [options.limit] - Limite du nombre de résultats (default: 100)
+ * @param {string} [options.orderBy] - Tri (default: 'created_at')
+ * @param {boolean} [options.ascending] - Ordre croissant (default: false = DESC)
+ * 
+ * @returns {Promise<{data: Array|null, error: Object|null}>}
+ * 
+ * @example
+ * const result = await getCitizenReports('uuid-user');
+ * const pending = await getCitizenReports('uuid-user', { status: 'pending' });
+ */
+export async function getCitizenReports(userId, options = {}) {
+  try {
+    if (!userId) {
+      return {
+        data: null,
+        error: {
+          message: 'ID utilisateur requis',
+          code: 'MISSING_USER_ID'
+        }
+      };
+    }
+
+    const {
+      status,
+      commune_id,
+      limit = 100,
+      orderBy = 'created_at',
+      ascending = false
+    } = options;
+
+    // IMPORTANT: Pour les voice users (pas de session Supabase Auth),
+    // on doit filtrer explicitement par citizen_user_id
+    // La RLS policy permet cela car elle vérifie que citizen_user_id existe dans voice_users
+    let query = supabase
+      .from('reports')
+      .select(`
+        *,
+        commune:commune_id (
+          id,
+          name,
+          region
+        )
+      `)
+      .eq('citizen_user_id', userId)  // Filtrer explicitement par user ID
+      .limit(limit)
+      .order(orderBy, { ascending });
+
+    // Filtre par statut si fourni
+    if (status) {
+      query = query.eq('status', status);
+    }
+
+    // Filtre par commune si fourni
+    if (commune_id) {
+      query = query.eq('commune_id', commune_id);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error(' Erreur récupération signalements citoyen:', error);
+      return { data: null, error };
+    }
+
+    console.log(`✅ ${data?.length || 0} signalements récupérés pour le citoyen`);
+    return { data: data || [], error: null };
+
+  } catch (err) {
+    console.error('❌ Erreur inattendue getCitizenReports:', err);
     return {
       data: null,
       error: {
@@ -490,6 +577,165 @@ export async function updateReportPriority(reportId, newPriority) {
 
   } catch (err) {
     console.error('❌ Erreur inattendue updateReportPriority:', err);
+    return {
+      data: null,
+      error: {
+        message: err.message || 'Erreur inattendue',
+        code: 'UNEXPECTED_ERROR'
+      }
+    };
+  }
+}
+
+/**
+ * Mettre à jour le type d'un signalement (AGENT/ADMIN uniquement)
+ * 
+ * @param {string} reportId - UUID du signalement
+ * @param {string} newType - Nouveau type (voirie, eclairage, eau, etc.)
+ * 
+ * @returns {Promise<{data: Object|null, error: Object|null}>}
+ * 
+ * @example
+ * // Agent change le type après avoir écouté l'audio
+ * const result = await updateReportType('uuid-report', 'securite');
+ * 
+ * @security
+ * - RLS Policy vérifie que l'agent modifie SEULEMENT sa commune
+ * - Admin peut modifier tous les signalements
+ */
+/**
+ * Récupérer les signalements d'une commune pour les tendances (agent)
+ * 
+ * @param {string} communeId - UUID de la commune
+ * @param {Object} [options] - Options de filtrage
+ * @param {Date} [options.startDate] - Date de début (pour filtrer par période)
+ * @param {number} [options.limit] - Limite du nombre de résultats (default: 10000 pour analytics)
+ * 
+ * @returns {Promise<{data: Array|null, error: Object|null}>}
+ * 
+ * @example
+ * const result = await getAgentTrendsReports('uuid-dakar', { startDate: new Date('2025-01-01') });
+ */
+export async function getAgentTrendsReports(communeId, options = {}) {
+  try {
+    if (!communeId) {
+      return {
+        data: null,
+        error: {
+          message: 'ID de la commune requis',
+          code: 'MISSING_COMMUNE_ID'
+        }
+      };
+    }
+
+    const { startDate, limit = 10000 } = options;
+
+    let query = supabase
+      .from('reports')
+      .select('id, type, status, priority, created_at')
+      .eq('commune_id', communeId)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    // Filtrer par date de début si fournie
+    if (startDate) {
+      query = query.gte('created_at', startDate.toISOString());
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('❌ Erreur récupération signalements pour tendances:', error);
+      return { data: null, error };
+    }
+
+    console.log(`✅ ${data?.length || 0} signalements récupérés pour tendances`);
+    return { data: data || [], error: null };
+
+  } catch (err) {
+    console.error('❌ Erreur inattendue getAgentTrendsReports:', err);
+    return {
+      data: null,
+      error: {
+        message: err.message || 'Erreur inattendue',
+        code: 'UNEXPECTED_ERROR'
+      }
+    };
+  }
+}
+
+export async function updateReportType(reportId, newType) {
+  try {
+    // Validation basique
+    if (!reportId) {
+      return {
+        data: null,
+        error: {
+          message: 'ID du signalement requis',
+          code: 'MISSING_REPORT_ID'
+        }
+      };
+    }
+
+    if (!newType) {
+      return {
+        data: null,
+        error: {
+          message: 'Nouveau type requis',
+          code: 'MISSING_TYPE'
+        }
+      };
+    }
+
+    // Types valides
+    const validTypes = [
+      'voirie',
+      'eclairage',
+      'eau',
+      'proprete',
+      'securite',
+      'sante',
+      'electricite',
+      'assainissement',
+      'espaces_verts',
+      'autre'
+    ];
+
+    if (!validTypes.includes(newType)) {
+      return {
+        data: null,
+        error: {
+          message: 'Type invalide',
+          code: 'INVALID_TYPE'
+        }
+      };
+    }
+
+    // Mise à jour dans Supabase
+    const { data, error } = await supabase
+      .from('reports')
+      .update({ type: newType })
+      .eq('id', reportId)
+      .select(`
+        *,
+        commune:commune_id (
+          id,
+          name,
+          region
+        )
+      `)
+      .single();
+
+    if (error) {
+      console.error('❌ Erreur updateReportType:', error);
+      return { data: null, error };
+    }
+
+    console.log('✅ Type mis à jour:', reportId, '→', newType);
+    return { data, error: null };
+
+  } catch (err) {
+    console.error('❌ Erreur inattendue updateReportType:', err);
     return {
       data: null,
       error: {
@@ -781,10 +1027,13 @@ export default {
   getReportById,
   getReportsByCommune,
   getReportsCount,
+  getCitizenReports,
   updateReportStatus,
   updateReportPriority,
+  updateReportType,
   getAdminReports,
   getGlobalStatistics,
-  getTopCommunes
+  getTopCommunes,
+  getAgentTrendsReports
 };
 

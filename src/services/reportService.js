@@ -128,9 +128,10 @@ export async function compressImage(file, options = {}) {
 export function validateReportData(formData) {
   const errors = {};
 
-  // 1. Type obligatoire
-  if (!formData.type || formData.type.trim() === '') {
-    errors.type = 'Le type de signalement est obligatoire';
+  // 1. Type optionnel (peut être 'autre' par défaut si non fourni)
+  // Si fourni, doit être valide
+  if (formData.type && formData.type.trim() === '') {
+    errors.type = 'Le type de signalement ne peut pas être vide';
   }
 
   // 2. Latitude obligatoire et valide (-90 à 90)
@@ -186,6 +187,7 @@ export function validateReportData(formData) {
  * @param {number} formData.longitude - Longitude GPS
  * @param {string} [formData.description] - Description
  * @param {File} [formData.imageFile] - Fichier image (optionnel)
+ * @param {Blob} [formData.audioBlob] - Audio enregistré (optionnel)
  * @param {string} [formData.phone] - Téléphone
  * @param {string} [formData.citizen_name] - Nom du citoyen
  * @param {string} [formData.commune_id] - ID de la commune
@@ -232,6 +234,7 @@ export async function submitReport(formData) {
 
     // Étape 2 : Upload de l'image (si fournie)
     let imageUrl = null;
+    let audioUrl = null;
     if (formData.imageFile) {
       console.log('📷 Image fournie, compression et upload en cours...');
 
@@ -263,6 +266,24 @@ export async function submitReport(formData) {
       console.log('✅ Image uploadée:', imageUrl);
     }
 
+    // Étape 2b : Upload de l'audio (si fourni)
+    const audioSource = formData.audioFile || formData.audioBlob;
+    if (audioSource) {
+      console.log('🎙️ Audio fourni, upload en cours...');
+
+      const audioUploadResult = await storageApi.uploadReportAudio(audioSource, null);
+      if (audioUploadResult.error) {
+        return {
+          report: null,
+          error: audioUploadResult.error,
+          validationErrors: null,
+        };
+      }
+
+      audioUrl = audioUploadResult.url;
+      console.log('✅ Audio uploadé:', audioUrl);
+    }
+
     // Étape 3 : Création du signalement
     console.log('💾 Création du signalement dans la base de données...');
     const reportResult = await reportApi.createReport({
@@ -272,8 +293,10 @@ export async function submitReport(formData) {
       longitude: formData.longitude,
       commune_id: formData.commune_id || null,
       image_url: imageUrl,
+      audio_url: audioUrl,
       phone: formData.phone || null,
-      citizen_name: formData.citizen_name || null
+      citizen_name: formData.citizen_name || null,
+      citizen_user_id: formData.citizen_user_id || null
       // Note : code_suivi reste NULL (pas de tracking pour MVP)
     });
 
@@ -326,6 +349,18 @@ export async function getAllReports(options = {}) {
  */
 export async function getReportById(id) {
   return await reportApi.getReportById(id);
+}
+
+/**
+ * Récupérer les signalements d'un citoyen
+ * (Simple wrapper autour de reportApi pour cohérence)
+ * 
+ * @param {string} userId - UUID de l'utilisateur citoyen
+ * @param {Object} [options] - Options de filtrage
+ * @returns {Promise<{data: Array|null, error: Object|null}>}
+ */
+export async function getCitizenReports(userId, options = {}) {
+  return await reportApi.getCitizenReports(userId, options);
 }
 
 /**
@@ -405,6 +440,87 @@ export async function getAgentStatistics(communeId) {
 
   } catch (err) {
     console.error('❌ Erreur calcul statistiques:', err);
+    return {
+      stats: null,
+      error: {
+        message: err.message || 'Erreur lors du calcul des statistiques',
+        code: 'STATS_ERROR'
+      }
+    };
+  }
+}
+
+/**
+ * Récupérer les statistiques d'un citoyen
+ * 
+ * @param {string} userId - UUID de l'utilisateur citoyen
+ * @returns {Promise<{stats: Object|null, error: Object|null}>}
+ * 
+ * @example
+ * const result = await getCitizenStatistics('uuid-user');
+ * if (result.stats) {
+ *   console.log('Total:', result.stats.total);
+ *   console.log('En attente:', result.stats.pending);
+ * }
+ */
+export async function getCitizenStatistics(userId) {
+  try {
+    if (!userId) {
+      return {
+        stats: null,
+        error: {
+          message: 'ID utilisateur requis',
+          code: 'MISSING_USER_ID'
+        }
+      };
+    }
+
+    console.log(`📊 Calcul des statistiques pour le citoyen: ${userId}`);
+
+    // Récupérer tous les signalements du citoyen
+    const { data: reports, error } = await reportApi.getCitizenReports(userId, {
+      limit: 1000 // Limite haute pour avoir tous les signalements
+    });
+
+    if (error) {
+      return {
+        stats: null,
+        error
+      };
+    }
+
+    // Calcul des statistiques par statut
+    const stats = {
+      total: reports.length,
+      pending: reports.filter(r => r.status === 'pending').length,
+      in_progress: reports.filter(r => r.status === 'in_progress').length,
+      resolved: reports.filter(r => r.status === 'resolved').length,
+      rejected: reports.filter(r => r.status === 'rejected').length,
+    };
+
+    // Calcul des statistiques par type (optionnel)
+    const byType = {};
+    reports.forEach(r => {
+      byType[r.type] = (byType[r.type] || 0) + 1;
+    });
+    stats.by_type = byType;
+
+    // Calcul des statistiques par priorité (optionnel)
+    const byPriority = {};
+    reports.forEach(r => {
+      byPriority[r.priority] = (byPriority[r.priority] || 0) + 1;
+    });
+    stats.by_priority = byPriority;
+
+    console.log(`✅ Statistiques citoyen calculées:`, stats);
+
+    return {
+      stats,
+      error: null
+    };
+
+  } catch (err) {
+    console.error('❌ Erreur calcul statistiques citoyen:', err);
     return {
       stats: null,
       error: {
@@ -498,7 +614,7 @@ export function exportToCSV(reports) {
  */
 export function downloadCSV(reports, filename = 'signalements.csv') {
   const csv = exportToCSV(reports);
-  
+
   if (!csv) {
     console.error('❌ Impossible de générer le CSV');
     return;
@@ -591,6 +707,66 @@ export async function calculateGlobalAnalytics() {
 }
 
 /**
+ * Mettre à jour le type d'un signalement
+ * 
+ * @param {string} reportId - ID du signalement
+ * @param {string} newType - Nouveau type (voirie, eclairage, eau, etc.)
+ * @returns {Promise<{success: boolean, data?: Object, error?: Object}>}
+ * 
+ * @example
+ * const result = await updateType('uuid-report', 'securite');
+ * if (result.success) {
+ *   console.log('Type mis à jour:', result.data);
+ * }
+ */
+export async function updateType(reportId, newType) {
+  try {
+    if (!reportId) {
+      return {
+        success: false,
+        error: {
+          message: 'ID du signalement requis',
+          code: 'MISSING_REPORT_ID',
+        },
+      };
+    }
+
+    if (!newType) {
+      return {
+        success: false,
+        error: {
+          message: 'Nouveau type requis',
+          code: 'MISSING_TYPE',
+        },
+      };
+    }
+
+    const result = await reportApi.updateReportType(reportId, newType);
+
+    if (result.error) {
+      return {
+        success: false,
+        error: result.error,
+      };
+    }
+
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (err) {
+    console.error('❌ Erreur updateType:', err);
+    return {
+      success: false,
+      error: {
+        message: err.message || 'Erreur lors de la mise à jour du type',
+        code: 'UNEXPECTED_ERROR',
+      },
+    };
+  }
+}
+
+/**
  * Calculer les trends (évolution dans le temps)
  * 
  * @param {Array} reports - Tous les signalements
@@ -630,6 +806,9 @@ export default {
   getAllReports,
   getReportById,
   getAgentStatistics,
+  getCitizenStatistics,
+  getCitizenReports,
+  updateType,
   exportToCSV,
   downloadCSV,
   calculateGlobalAnalytics,

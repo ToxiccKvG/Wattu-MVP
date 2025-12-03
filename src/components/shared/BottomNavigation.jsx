@@ -1,14 +1,14 @@
 
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Home, Map, PlusCircle, Settings } from 'lucide-react';
+import { Home, Map, PlusCircle, FileText } from 'lucide-react';
 
 /**
  * Bottom Navigation pour citoyens (Mobile-first)
  * 
  * Rôle :
  * - Navigation principale en bas de l'écran
- * - 4 onglets : Accueil, Carte, Signaler, Paramètres
+ * - 4 onglets : Accueil, Signaler, Carte, Mes signalements
  * - Design moderne avec animations fluides
  * - Active state visuellement clair
  * 
@@ -26,15 +26,9 @@ function BottomNavigation() {
 
   const navItems = [
     {
-      to: '/',
+      to: '/home',
       icon: Home,
       label: t('nav.home', { defaultValue: 'Accueil' }),
-      exact: true, // Match exact pour "/"
-    },
-    {
-      to: '/carte',
-      icon: Map,
-      label: t('nav.map', { defaultValue: 'Carte' }),
     },
     {
       to: '/signalements/nouveau',
@@ -42,9 +36,14 @@ function BottomNavigation() {
       label: t('nav.report', { defaultValue: 'Signaler' }),
     },
     {
-      to: '/parametres',
-      icon: Settings,
-      label: t('nav.settings', { defaultValue: 'Paramètres' }),
+      to: '/carte',
+      icon: Map,
+      label: t('nav.map', { defaultValue: 'Carte' }),
+    },
+    {
+      to: '/citizen/dashboard',
+      icon: FileText,
+      label: t('nav.my_reports', { defaultValue: 'Mes signalements' }),
     },
   ];
 

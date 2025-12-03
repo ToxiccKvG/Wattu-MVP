@@ -3,7 +3,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/shared/Logo';
-import { LayoutDashboard, FileText, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, FileText, LogOut, Menu, X, BarChart3 } from 'lucide-react';
 import { useState } from 'react';
 
 /**
@@ -67,6 +67,11 @@ function AgentLayout() {
       label: 'Signalements',
       path: '/agent/reports',
       icon: FileText
+    },
+    {
+      label: 'Tendances',
+      path: '/agent/trends',
+      icon: BarChart3
     }
   ];
 

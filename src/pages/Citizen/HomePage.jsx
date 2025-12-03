@@ -1,7 +1,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { PlusCircle, Map } from 'lucide-react';
+import { PlusCircle, Map, FileText } from 'lucide-react';
 
 /**
  * Page d'accueil pour citoyens (Dashboard public)
@@ -36,7 +36,7 @@ function HomePage() {
       </section>
 
       {/* Accès Rapides */}
-      <section className="grid md:grid-cols-2 gap-6">
+      <section className="grid md:grid-cols-3 gap-6">
         <Link
           to="/signalements/nouveau"
           className="p-6 bg-white rounded-xl border-2 border-neutral-200 hover:border-primary-500 transition-all hover:shadow-lg"
@@ -60,6 +60,19 @@ function HomePage() {
           </h3>
           <p className="text-neutral-600">
             {t('home.quick.map.desc', { defaultValue: 'Découvrez les signalements de votre ville' })}
+          </p>
+        </Link>
+
+        <Link
+          to="/citizen/dashboard"
+          className="p-6 bg-white rounded-xl border-2 border-neutral-200 hover:border-primary-500 transition-all hover:shadow-lg"
+        >
+          <FileText className="w-12 h-12 text-primary-600 mb-4" />
+          <h3 className="text-xl font-semibold mb-2">
+            {t('home.quick.dashboard.title', { defaultValue: 'Mes signalements' })}
+          </h3>
+          <p className="text-neutral-600">
+            {t('home.quick.dashboard.desc', { defaultValue: 'Consultez l\'historique de vos signalements' })}
           </p>
         </Link>
       </section>

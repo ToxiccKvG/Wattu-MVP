@@ -38,6 +38,55 @@
     "no_data": "Aucune donnée disponible",
     "reports": "Signalements"
   },
+  "analytics": {
+    "title": "Analytics",
+    "subtitle": "Analyse statistique globale de la plateforme",
+    "period": {
+      "7d": "7 derniers jours",
+      "30d": "30 derniers jours",
+      "90d": "90 derniers jours",
+      "all": "Tout"
+    },
+    "by_type": {
+      "title": "Répartition par type"
+    },
+    "by_status": {
+      "title": "Répartition par statut"
+    },
+    "by_priority": {
+      "title": "Répartition par priorité"
+    },
+    "by_commune": {
+      "title": "Répartition par commune",
+      "subtitle": "Top 10 communes"
+    },
+    "no_data": "Aucune donnée disponible",
+    "error": "Erreur lors du chargement des analytics"
+  },
+  "status": {
+    "pending": "En attente",
+    "in_progress": "En cours",
+    "resolved": "Résolu",
+    "rejected": "Rejeté"
+  },
+  "priority": {
+    "low": "Faible",
+    "normal": "Normal",
+    "high": "Élevée",
+    "urgent": "Urgent"
+  },
+  "report_types": {
+    "road": "Voirie",
+    "lighting": "Éclairage public",
+    "water": "Problème d'eau",
+    "waste": "Déchets/Salubrité",
+    "security": "Sécurité",
+    "health": "Santé",
+    "electricity": "Électricité",
+    "sanitation": "Assainissement",
+    "green_spaces": "Espaces verts",
+    "other": "Autre"
+  },
   "reports": {
     "title": "Tous les Signalements",
     "subtitle": "Gérer tous les signalements de toutes les communes",

@@ -1,172 +1,154 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Camera, X, Loader2 } from 'lucide-react';
+import { Loader2, Mic, Square, RefreshCcw, AlertCircle, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import LocationPicker from '@/components/maps/LocationPicker';
 import SuccessModal from '@/components/shared/SuccessModal';
-import useCommunes from '@/hooks/useCommunes';
-import useImageUpload from '@/hooks/useImageUpload';
+import useAudioRecording from '@/hooks/useAudioRecording';
+import useGeolocation from '@/hooks/useGeolocation';
+import LocationConfirmationCard from '@/components/shared/LocationConfirmationCard';
+import PhotoBottomSheet from '@/components/shared/PhotoBottomSheet';
+import { useAuth } from '@/context/AuthContext';
 import * as reportService from '@/services/reportService';
 
 /**
- * Types de signalements disponibles
- */
-const REPORT_TYPES = [
-  { value: 'voirie', label: 'Voirie (route, trottoir, nid de poule)' },
-  { value: 'eclairage', label: 'Éclairage public' },
-  { value: 'proprete', label: 'Propreté (déchets, ordures)' },
-  { value: 'eau', label: 'Eau (fuite, coupure)' },
-  { value: 'electricite', label: 'Électricité (panne, coupure)' },
-  { value: 'assainissement', label: 'Assainissement (égouts, drainage)' },
-  { value: 'espaces_verts', label: 'Espaces verts (parcs, arbres)' },
-  { value: 'securite', label: 'Sécurité publique' },
-  { value: 'autre', label: 'Autre' },
-];
-
-/**
- * Composant SignalementForm - Formulaire complet de signalement
+ * Composant SignalementForm - Formulaire simplifié de signalement vocal
  * 
- * Fonctionnalités :
- * - Tous les champs du signalement
- * - Upload d'image avec preview et compression
- * - Sélection GPS/Manuel de la position
- * - Validation complète
- * - Soumission avec états loading/error/success
- * - Modal de succès après soumission
+ * Nouveau flux simplifié (SANS analyse audio Gemini) :
+ * 1. Enregistrement audio (30s max)
+ * 2. Confirmation de localisation GPS
+ * 3. Sélection photo optionnelle (bottom sheet)
+ * 4. Soumission directe avec audio + infos citoyen depuis profil
  * 
- * Props : Aucune (formulaire standalone)
+ * Les informations du citoyen (nom, téléphone, commune, adresse, email) sont
+ * automatiquement récupérées depuis le profil utilisateur connecté.
+ * L'audio est envoyé directement à Supabase Storage sans transcription.
  * 
  * @example
  * <SignalementForm />
  */
 function SignalementForm() {
   const { t } = useTranslation('common');
-  const { communes, loading: communesLoading } = useCommunes();
-  const {
-    imageFile,
-    imagePreview,
-    isCompressing,
-    error: imageError,
-    selectImage,
-    removeImage
-  } = useImageUpload();
+  const { user, getVoiceUser, isVoiceAuthenticated } = useAuth(); // Récupérer les infos du citoyen connecté
+  const audioRecording = useAudioRecording({ maxDuration: 30 });
+  const geolocation = useGeolocation();
 
-  // État du formulaire
-  const [formData, setFormData] = useState({
-    type: '',
-    description: '',
-    position: null, // { lat, lng }
-    commune_id: '',
-    phone: '',
-    citizen_name: ''
-  });
+  const [step, setStep] = useState('idle'); // idle | recording | location | photo | submitting
+  const [showManualLocation, setShowManualLocation] = useState(false);
+  const [locationConfirmed, setLocationConfirmed] = useState(false);
+  const [isManualPosition, setIsManualPosition] = useState(false);
+  const [showPhotoSheet, setShowPhotoSheet] = useState(false);
+  const [selectedPhotoFile, setSelectedPhotoFile] = useState(null);
+  const [reportType, setReportType] = useState(''); // Type choisi par le citoyen
+  const [position, setPosition] = useState(null);
 
-  // États UI
-  const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [createdReport, setCreatedReport] = useState(null);
 
   /**
-   * Gérer les changements de champs
+   * Valider les données avant soumission
    */
-  const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    // Effacer l'erreur du champ modifié
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: null }));
+  const validateData = () => {
+    // Vérifier qu'un type de problème a été choisi
+    if (!reportType) {
+      return { valid: false, error: t('errors.type_required', { defaultValue: 'Choisissez le type de problème à signaler' }) };
     }
+
+    // Vérifier qu'on a un audio
+    if (!audioRecording.audioBlob) {
+      return { valid: false, error: t('errors.audio_required', { defaultValue: 'Un enregistrement audio est requis' }) };
+    }
+    // Vérifier qu'on a une position GPS
+    if (!position) {
+      return { valid: false, error: t('errors.position_required', { defaultValue: 'La position GPS est obligatoire' }) };
+    }
+    // Note: commune_id n'est plus obligatoire pour les voice users
+    // Les agents pourront assigner la commune plus tard
+    return { valid: true };
   };
 
   /**
-   * Valider le formulaire
+   * Soumettre le signalement
+   * @param {File|null} photoFile - Fichier photo passé directement (pour éviter problème setState async)
    */
-  const validateForm = () => {
-    const newErrors = {};
-
-    // Type obligatoire
-    if (!formData.type) {
-      newErrors.type = t('errors.type_required', { defaultValue: 'Le type est obligatoire' });
+  const handleSubmit = async (photoFile = null) => {
+    // Protection contre les doubles appels
+    if (isSubmitting) {
+      console.warn('⚠️ Soumission déjà en cours, ignoré');
+      return;
     }
 
-    // Position obligatoire
-    if (!formData.position) {
-      newErrors.position = t('errors.position_required', {
-        defaultValue: 'La position GPS est obligatoire'
-      });
-    }
-
-    // Commune obligatoire (selon les specs du brief)
-    if (!formData.commune_id) {
-      newErrors.commune_id = t('errors.commune_required', {
-        defaultValue: 'La commune est obligatoire'
-      });
-    }
-
-    // Téléphone obligatoire (selon les specs du brief)
-    if (!formData.phone || formData.phone.trim() === '') {
-      newErrors.phone = t('errors.phone_required', {
-        defaultValue: 'Le numéro de téléphone est obligatoire'
-      });
-    }
-
-    // Nom obligatoire (selon les specs du brief)
-    if (!formData.citizen_name || formData.citizen_name.trim() === '') {
-      newErrors.citizen_name = t('errors.name_required', {
-        defaultValue: 'Le nom est obligatoire'
-      });
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  /**
-   * Soumettre le formulaire
-   */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Validation
-    if (!validateForm()) {
-      console.log('❌ Validation échouée:', errors);
+    const validation = validateData();
+    if (!validation.valid) {
+      setSubmitError(validation.error);
       return;
     }
 
     setIsSubmitting(true);
     setSubmitError(null);
+    setStep('submitting');
+    
+    // Utiliser photoFile passé en paramètre OU selectedPhotoFile (fallback)
+    const finalPhotoFile = photoFile || selectedPhotoFile;
 
     try {
       console.log('📤 Soumission du signalement...');
 
-      // Préparer les données
+      // Convertir le Blob audio en File pour l'upload
+      const audioBlob = audioRecording.audioBlob;
+      
+      // Normaliser le type MIME (enlever les paramètres comme codecs=opus)
+      let normalizedMimeType = audioBlob.type || 'audio/webm';
+      // Si le type contient des paramètres (ex: "audio/webm;codecs=opus"), prendre seulement la partie principale
+      if (normalizedMimeType.includes(';')) {
+        normalizedMimeType = normalizedMimeType.split(';')[0];
+      }
+      
+      // S'assurer que le type est dans la liste autorisée
+      const allowedTypes = ['audio/webm', 'audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg'];
+      if (!allowedTypes.includes(normalizedMimeType)) {
+        // Fallback vers audio/webm si le type n'est pas reconnu
+        normalizedMimeType = 'audio/webm';
+      }
+      
+      const audioFile = new File([audioBlob], `audio-${Date.now()}.webm`, {
+        type: normalizedMimeType,
+      });
+      
+      console.log('🎤 Type MIME audio normalisé:', {
+        original: audioBlob.type,
+        normalized: normalizedMimeType,
+        size: audioBlob.size,
+      });
+
+      // Déterminer les infos citoyen (Supabase user OU voice user)
+      const voiceUser = getVoiceUser();
+      const isVoice = isVoiceAuthenticated();
+
       const submitData = {
-        type: formData.type,
-        description: formData.description || null,
-        latitude: formData.position.lat,
-        longitude: formData.position.lng,
-        commune_id: formData.commune_id,
-        phone: formData.phone,
-        citizen_name: formData.citizen_name,
-        imageFile: imageFile || null
+        type: reportType || 'autre', // Utiliser le type choisi, fallback ultime "autre"
+        description: null, // Pas de description textuelle, l'audio contient tout
+        latitude: position.lat,
+        longitude: position.lng,
+        commune_id: user?.commune_id || null, // Depuis le profil utilisateur (null pour voice users)
+        // Infos citoyen : priorité au voice user si authentifié vocalement
+        phone: isVoice ? (voiceUser?.phone || null) : (user?.phone || null),
+        citizen_name: isVoice 
+          ? `${voiceUser?.prenom || ''} ${voiceUser?.name || ''}`.trim() 
+          : (user?.name || null),
+        email: user?.email || null,
+        citizen_user_id: isVoice ? voiceUser?.id : (user?.id || null), // Lier au voice_user ou user Supabase
+        imageFile: finalPhotoFile || null,
+        audioBlob: audioFile, // Audio envoyé directement
       };
 
-      // Soumettre via le service
       const result = await reportService.submitReport(submitData);
 
       if (result.validationErrors) {
-        setErrors(result.validationErrors);
+        setSubmitError(Object.values(result.validationErrors)[0] || t('errors.submit_failed'));
         console.error('❌ Erreurs de validation:', result.validationErrors);
         return;
       }
@@ -177,12 +159,9 @@ function SignalementForm() {
         return;
       }
 
-      // Succès !
       console.log('✅ Signalement créé:', result.report.id);
       setCreatedReport(result.report);
       setShowSuccess(true);
-
-      // Réinitialiser le formulaire
       resetForm();
 
     } catch (err) {
@@ -195,215 +174,214 @@ function SignalementForm() {
     }
   };
 
-  /**
-   * Réinitialiser le formulaire
-   */
   const resetForm = () => {
-    setFormData({
-      type: '',
-      description: '',
-      position: null,
-      commune_id: '',
-      phone: '',
-      citizen_name: ''
-    });
-    removeImage();
-    setErrors({});
+    setPosition(null);
+    setSelectedPhotoFile(null);
     setSubmitError(null);
+    setStep('idle');
+    setShowManualLocation(false);
+    setLocationConfirmed(false);
+    setIsManualPosition(false);
+    setShowPhotoSheet(false);
+    audioRecording.resetRecording();
   };
+
+  const handleStartRecording = async () => {
+    const permissionState = await audioRecording.requestPermission();
+    if (permissionState === 'denied') {
+      return;
+    }
+    const result = await audioRecording.startRecording();
+    if (result.success) {
+      setStep('recording');
+      setLocationConfirmed(false);
+      setShowManualLocation(false);
+      geolocation.startAutoCapture();
+    }
+  };
+
+  const handleStopRecording = () => {
+    audioRecording.stopRecording();
+    geolocation.cancelAutoCapture();
+    // Après l'arrêt de l'enregistrement, passer directement à la confirmation de localisation
+    setStep('location');
+  };
+
+  const handleRetryRecording = () => {
+    resetForm();
+  };
+
+  const handleToggleManualLocation = () => {
+    setShowManualLocation((prev) => !prev);
+    setIsManualPosition(true);
+  };
+
+  const handleLocationConfirmed = () => {
+    setLocationConfirmed(true);
+    // Après confirmation de la localisation, ouvrir le bottom sheet pour la photo
+    setStep('photo');
+    setShowPhotoSheet(true);
+  };
+
+  const handlePhotoSelected = (file) => {
+    setSelectedPhotoFile(file);
+    setShowPhotoSheet(false);
+    // Après sélection de la photo, soumettre automatiquement
+    // Passer le fichier directement car setState est asynchrone
+    handleSubmit(file);
+  };
+
+  const handlePhotoSkipped = () => {
+    setShowPhotoSheet(false);
+    // Si l'utilisateur passe la photo, soumettre directement
+    handleSubmit();
+  };
+
+  // Mettre à jour la position quand le GPS capture une position
+  useEffect(() => {
+    if (geolocation.position && !isManualPosition) {
+      setPosition({
+        lat: geolocation.position.latitude,
+        lng: geolocation.position.longitude,
+      });
+    }
+  }, [geolocation.position, isManualPosition]);
+
+  const recordingProgress = audioRecording.maxDuration
+    ? Math.min(100, Math.round((audioRecording.duration / audioRecording.maxDuration) * 100))
+    : 0;
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Type de signalement */}
-        <div>
-          <Label htmlFor="type">
-            {t('form.type', { defaultValue: 'Type de problème' })}
-            <span className="text-red-500 ml-1">*</span>
-          </Label>
-          <Select
-            value={formData.type}
-            onValueChange={(value) => handleChange('type', value)}
-          >
-            <SelectTrigger id="type" className="mt-2">
-              <SelectValue placeholder={t('form.select_type', { defaultValue: 'Sélectionnez un type' })} />
-            </SelectTrigger>
-            <SelectContent>
-              {REPORT_TYPES.map((type) => (
-                <SelectItem key={type.value} value={type.value}>
-                  {type.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.type && (
-            <p className="text-sm text-red-600 mt-1">{errors.type}</p>
-          )}
-        </div>
-
-        {/* Description */}
-        <div>
-          <Label htmlFor="description">
-            {t('form.description', { defaultValue: 'Description' })}
-          </Label>
-          <textarea
-            id="description"
-            value={formData.description}
-            onChange={(e) => handleChange('description', e.target.value)}
-            placeholder={t('form.description_placeholder', {
-              defaultValue: 'Décrivez le problème en détail...'
-            })}
-            className="mt-2 w-full min-h-[120px] px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-            maxLength={1000}
-          />
-          <p className="text-xs text-neutral-500 mt-1">
-            {formData.description.length}/1000 {t('form.characters', { defaultValue: 'caractères' })}
-          </p>
-          {errors.description && (
-            <p className="text-sm text-red-600 mt-1">{errors.description}</p>
-          )}
-        </div>
-
-        {/* Photo */}
-        <div>
-          <Label htmlFor="photo">
-            {t('form.photo', { defaultValue: 'Photo' })}
-          </Label>
-          <p className="text-sm text-neutral-600 mt-1 mb-3">
-            {t('form.photo_desc', { defaultValue: 'Ajoutez une photo pour illustrer le problème' })}
-          </p>
-
-          {!imagePreview ? (
-            <label
-              htmlFor="photo-input"
-              className="block w-full p-6 border-2 border-dashed border-neutral-300 rounded-lg hover:border-primary-500 transition-colors cursor-pointer"
-            >
-              <div className="flex flex-col items-center gap-2">
-                {isCompressing ? (
-                  <>
-                    <Loader2 className="w-10 h-10 text-primary-600 animate-spin" />
-                    <p className="text-sm text-primary-600 font-medium">
-                      {t('form.compressing', { defaultValue: 'Compression en cours...' })}
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <Camera className="w-10 h-10 text-neutral-400" />
-                    <p className="text-sm text-neutral-600">
-                      {t('form.click_to_upload', { defaultValue: 'Cliquez pour ajouter une photo' })}
-                    </p>
-                    <p className="text-xs text-neutral-500">
-                      JPEG, PNG, WebP (max 5MB)
-                    </p>
-                  </>
-                )}
+      <div className="space-y-6">
+        <section className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm space-y-4">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-neutral-900">
+                {t('voice.recording_title', { defaultValue: 'Enregistrement vocal' })}
+              </h3>
+              <div className="text-right">
+                <p className="text-2xl font-mono text-primary-700">{audioRecording.duration}s</p>
+                <p className="text-xs text-neutral-500">/ {audioRecording.maxDuration}s</p>
               </div>
-              <input
-                id="photo-input"
-                type="file"
-                accept="image/*"
-                onChange={selectImage}
-                className="hidden"
-                disabled={isCompressing}
-              />
-            </label>
-          ) : (
-            <div className="relative">
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className="w-full h-64 object-cover rounded-lg border-2 border-neutral-200"
-              />
-              <button
-                type="button"
-                onClick={removeImage}
-                className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
             </div>
-          )}
+            <div className="h-2 w-full rounded-full bg-neutral-200">
+              <div
+                className={`h-full rounded-full ${audioRecording.isRecording ? 'bg-primary-600 animate-pulse' : 'bg-primary-400'}`}
+                style={{ width: `${recordingProgress}%` }}
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              {!audioRecording.isRecording ? (
+                <Button
+                  type="button"
+                  onClick={handleStartRecording}
+                  disabled={!audioRecording.isSupported || step === 'submitting' || step === 'photo'}
+                  className="flex-1 md:flex-none"
+                >
+                  <Mic className="mr-2 h-4 w-4" />
+                  {step === 'idle'
+                    ? t('voice.start_recording', { defaultValue: 'Commencer l’enregistrement' })
+                    : t('voice.re_record', { defaultValue: 'Réenregistrer' })}
+                </Button>
+              ) : (
+                <Button type="button" variant="destructive" onClick={handleStopRecording} className="flex-1 md:flex-none">
+                  <Square className="mr-2 h-4 w-4" />
+                  {t('voice.stop_recording', { defaultValue: 'Arrêter' })}
+                </Button>
+              )}
+              {audioRecording.audioBlob && !audioRecording.isRecording && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleRetryRecording}
+                  disabled={step === 'submitting'}
+                  className="flex-1 md:flex-none"
+                >
+                  <RefreshCcw className="mr-2 h-4 w-4" />
+                  {t('voice.reset', { defaultValue: 'Réinitialiser' })}
+                </Button>
+              )}
+              {(!audioRecording.isSupported || audioRecording.error) && (
+                <div className="flex items-center gap-1 text-sm text-red-600">
+                  <AlertCircle className="h-4 w-4" />
+                  <span>
+                    {audioRecording.error?.message ||
+                      t('voice.not_supported', { defaultValue: 'Non supporté' })}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
 
-          {imageError && (
-            <p className="text-sm text-red-600 mt-2">{imageError.message}</p>
-          )}
-        </div>
+        {/* Choix du type de problème */}
+        <section className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-neutral-900">
+              {t('report.type_section_title', { defaultValue: 'Quel type de problème signalez-vous ?' })}
+            </h3>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { value: 'voirie', label: t('report_types.voirie', { defaultValue: 'Route / chaussée' }) },
+              { value: 'eclairage', label: t('report_types.eclairage', { defaultValue: 'Éclairage public' }) },
+              { value: 'eau', label: t('report_types.eau', { defaultValue: 'Eau' }) },
+              { value: 'dechets', label: t('report_types.dechets', { defaultValue: 'Déchets / Propreté' }) },
+              { value: 'securite', label: t('report_types.securite', { defaultValue: 'Sécurité' }) },
+              { value: 'assainissement', label: t('report_types.assainissement', { defaultValue: 'Assainissement' }) },
+              { value: 'espaces_verts', label: t('report_types.espaces_verts', { defaultValue: 'Espaces verts' }) },
+              { value: 'transport', label: t('report_types.transport', { defaultValue: 'Transport' }) },
+              { value: 'autre', label: t('report_types.autre', { defaultValue: 'Autre' }) },
+            ].map((type) => (
+              <button
+                key={type.value}
+                type="button"
+                onClick={() => setReportType(type.value)}
+                className={`px-3 py-2 rounded-full text-sm font-medium border transition-all flex items-center gap-2 ${
+                  reportType === type.value
+                    ? 'bg-primary-50 text-primary-900 border-primary-600 shadow-sm ring-2 ring-primary-200'
+                    : 'bg-white text-neutral-800 border-neutral-300 hover:bg-neutral-100'
+                }`}
+              >
+                {reportType === type.value && (
+                  <Check className="w-4 h-4" />
+                )}
+                {type.label}
+              </button>
+            ))}
+          </div>
+        </section>
 
-        {/* Emplacement (GPS/Manuel) */}
-        <LocationPicker
-          value={formData.position}
-          onChange={(pos) => handleChange('position', pos)}
-          error={errors.position}
-        />
-
-        {/* Commune */}
-        <div>
-          <Label htmlFor="commune">
-            {t('form.commune', { defaultValue: 'Commune' })}
-            <span className="text-red-500 ml-1">*</span>
-          </Label>
-          <Select
-            value={formData.commune_id}
-            onValueChange={(value) => handleChange('commune_id', value)}
-            disabled={communesLoading}
-          >
-            <SelectTrigger id="commune" className="mt-2">
-              <SelectValue placeholder={
-                communesLoading
-                  ? t('form.loading_communes', { defaultValue: 'Chargement...' })
-                  : t('form.select_commune', { defaultValue: 'Sélectionnez votre commune' })
-              } />
-            </SelectTrigger>
-            <SelectContent>
-              {communes.map((commune) => (
-                <SelectItem key={commune.id} value={commune.id}>
-                  {commune.name} ({commune.region})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.commune_id && (
-            <p className="text-sm text-red-600 mt-1">{errors.commune_id}</p>
-          )}
-        </div>
-
-        {/* Téléphone */}
-        <div>
-          <Label htmlFor="phone">
-            {t('form.phone', { defaultValue: 'Numéro de téléphone' })}
-            <span className="text-red-500 ml-1">*</span>
-          </Label>
-          <Input
-            id="phone"
-            type="tel"
-            value={formData.phone}
-            onChange={(e) => handleChange('phone', e.target.value)}
-            placeholder="+221 77 123 45 67"
-            className="mt-2"
+        {/* Confirmation de localisation - affichée après enregistrement audio */}
+        {step === 'location' && audioRecording.audioBlob && (
+          <section className="space-y-4 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+          <LocationConfirmationCard
+            status={geolocation.autoCaptureStatus}
+            elapsed={geolocation.autoCaptureElapsed}
+            position={position}
+            accuracy={geolocation.position?.accuracy}
+            error={geolocation.autoCaptureError}
+            isConfirmed={locationConfirmed}
+            onConfirm={handleLocationConfirmed}
+            onRetry={() => geolocation.startAutoCapture()}
+            onManualSelect={handleToggleManualLocation}
           />
-          {errors.phone && (
-            <p className="text-sm text-red-600 mt-1">{errors.phone}</p>
-          )}
-        </div>
 
-        {/* Nom */}
-        <div>
-          <Label htmlFor="name">
-            {t('form.name', { defaultValue: 'Votre nom' })}
-            <span className="text-red-500 ml-1">*</span>
-          </Label>
-          <Input
-            id="name"
-            type="text"
-            value={formData.citizen_name}
-            onChange={(e) => handleChange('citizen_name', e.target.value)}
-            placeholder={t('form.name_placeholder', { defaultValue: 'Amadou Diallo' })}
-            className="mt-2"
-          />
-          {errors.citizen_name && (
-            <p className="text-sm text-red-600 mt-1">{errors.citizen_name}</p>
-          )}
-        </div>
+            {showManualLocation && (
+              <LocationPicker
+                value={position}
+                onChange={(pos) => {
+                  setIsManualPosition(true);
+                  setPosition(pos);
+                  setLocationConfirmed(true);
+                  handleLocationConfirmed();
+                }}
+                error={null}
+              />
+            )}
+          </section>
+        )}
 
         {/* Erreur de soumission */}
         {submitError && (
@@ -412,22 +390,26 @@ function SignalementForm() {
           </div>
         )}
 
-        {/* Bouton de soumission */}
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={isSubmitting || isCompressing}
-        >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              {t('form.submitting', { defaultValue: 'Envoi en cours...' })}
-            </>
-          ) : (
-            t('form.submit', { defaultValue: 'Envoyer le signalement' })
-          )}
-        </Button>
-      </form>
+        {/* État de soumission */}
+        {step === 'submitting' && (
+          <div className="rounded-xl border border-primary-200 bg-primary-50 p-4 flex items-center gap-3">
+            <Loader2 className="h-5 w-5 text-primary-600 animate-spin" />
+            <div>
+              <p className="text-sm font-medium text-primary-900">
+                {t('form.submitting', { defaultValue: 'Envoi en cours...' })}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Bottom Sheet pour la photo */}
+      <PhotoBottomSheet
+        open={showPhotoSheet}
+        onClose={() => setShowPhotoSheet(false)}
+        onPhotoSelected={handlePhotoSelected}
+        onSkip={handlePhotoSkipped}
+      />
 
       {/* Modal de succès */}
       <SuccessModal

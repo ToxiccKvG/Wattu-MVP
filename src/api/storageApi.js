@@ -2,34 +2,18 @@
 import { supabase } from '@/config/supabase';
 
 /**
- * API Layer pour Supabase Storage (Images de signalements)
+ * API Layer pour Supabase Storage (Images & Audio des signalements)
  * 
- * Interactions directes avec Supabase Storage :
- * - UPLOAD : Upload une image pour un signalement
- * - DELETE : Supprimer une image (admins uniquement)
- * - GET URL : Récupérer l'URL publique d'une image
- * 
- * Bucket : report-images
- * - Public : true
- * - Limite : 5MB
- * - Types : image/jpeg, image/png, image/jpg, image/webp
- * - Organisation : report-images/reports/{report-id}-{timestamp}.ext
+ * Buckets :
+ * - report-images : photos (5MB max)
+ * - report-audio  : enregistrements vocaux (10MB max, audio/webm|mp3|mpeg|wav|ogg)
  */
 
-/**
- * Types MIME autorisés pour les images
- */
-const ALLOWED_IMAGE_TYPES = [
-  'image/jpeg',
-  'image/jpg',
-  'image/png',
-  'image/webp'
-];
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-/**
- * Taille maximale du fichier (5MB)
- */
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB en bytes
+const ALLOWED_AUDIO_TYPES = ['audio/webm', 'audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg'];
+const MAX_AUDIO_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 /**
  * Upload une image pour un signalement
@@ -244,13 +228,142 @@ export function isValidFileSize(fileSize) {
   return fileSize <= MAX_FILE_SIZE;
 }
 
+function getAudioExtension(mimeType) {
+  switch (mimeType) {
+    case 'audio/mpeg':
+    case 'audio/mp3':
+      return 'mp3';
+    case 'audio/wav':
+      return 'wav';
+    case 'audio/ogg':
+      return 'ogg';
+    case 'audio/webm':
+    default:
+      return 'webm';
+  }
+}
+
+export async function uploadReportAudio(file, reportId = null) {
+  try {
+    if (!file) {
+      return {
+        url: null,
+        path: null,
+        error: {
+          message: 'Aucun fichier audio fourni',
+          code: 'NO_AUDIO_FILE',
+        },
+      };
+    }
+
+    // Normaliser le type MIME (enlever les paramètres comme codecs=opus)
+    let mimeType = file.type || 'audio/webm';
+    if (mimeType.includes(';')) {
+      mimeType = mimeType.split(';')[0].trim();
+    }
+
+    if (!ALLOWED_AUDIO_TYPES.includes(mimeType)) {
+      return {
+        url: null,
+        path: null,
+        error: {
+          message: `Type audio non autorisé. Types acceptés: ${ALLOWED_AUDIO_TYPES.join(', ')}. Type reçu: ${file.type || 'inconnu'}`,
+          code: 'INVALID_AUDIO_TYPE',
+        },
+      };
+    }
+
+    if (file.size > MAX_AUDIO_FILE_SIZE) {
+      return {
+        url: null,
+        path: null,
+        error: {
+          message: `Audio trop volumineux (max 10MB). Taille actuelle: ${(file.size / 1024 / 1024).toFixed(2)}MB`,
+          code: 'AUDIO_TOO_LARGE',
+        },
+      };
+    }
+
+    const timestamp = Date.now();
+    const extension = file.name?.split('.')?.pop() || getAudioExtension(mimeType);
+    const reportUuid = reportId || `temp-${timestamp}`;
+    const fileName = `${reportUuid}-${timestamp}.${extension}`;
+    const filePath = `records/${fileName}`;
+
+    console.log(`📤 Upload audio en cours: ${filePath} (${(file.size / 1024).toFixed(2)}KB)`);
+
+    const { error } = await supabase.storage.from('report-audio').upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false,
+      contentType: mimeType,
+    });
+
+    if (error) {
+      console.error('❌ Erreur upload audio Supabase:', error);
+      
+      // Si l'erreur est "Bucket not found", donner des instructions claires
+      if (error.message?.includes('Bucket not found') || 
+          error.message?.includes('not found') ||
+          error.message?.includes('does not exist') ||
+          error.statusCode === 404) {
+        return {
+          url: null,
+          path: null,
+          error: {
+            message: 'Le bucket de stockage audio "report-audio" n\'existe pas ou n\'est pas accessible. Veuillez contacter l\'administrateur.',
+            code: 'BUCKET_NOT_FOUND',
+            originalError: error,
+            hint: 'Le bucket doit être créé dans Supabase Dashboard > Storage avec les permissions publiques.',
+          },
+        };
+      }
+      
+      return { url: null, path: null, error };
+    }
+
+    const { data: publicUrlData } = supabase.storage.from('report-audio').getPublicUrl(filePath);
+    const publicUrl = publicUrlData.publicUrl;
+
+    console.log('✅ Audio uploadé:', publicUrl);
+
+    return {
+      url: publicUrl,
+      path: filePath,
+      error: null,
+    };
+  } catch (err) {
+    console.error('❌ Erreur inattendue uploadReportAudio:', err);
+    return {
+      url: null,
+      path: null,
+      error: {
+        message: err.message || 'Erreur inattendue',
+        code: 'UNEXPECTED_ERROR',
+      },
+    };
+  }
+}
+
+export function isAllowedAudioType(mimeType) {
+  return ALLOWED_AUDIO_TYPES.includes(mimeType);
+}
+
+export function isValidAudioSize(fileSize) {
+  return fileSize <= MAX_AUDIO_FILE_SIZE;
+}
+
 export default {
   uploadReportImage,
+  uploadReportAudio,
   deleteReportImage,
   getPublicUrl,
   isAllowedImageType,
   isValidFileSize,
+  isAllowedAudioType,
+  isValidAudioSize,
   ALLOWED_IMAGE_TYPES,
-  MAX_FILE_SIZE
+  MAX_FILE_SIZE,
+  ALLOWED_AUDIO_TYPES,
+  MAX_AUDIO_FILE_SIZE,
 };
 

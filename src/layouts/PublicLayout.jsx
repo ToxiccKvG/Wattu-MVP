@@ -1,8 +1,9 @@
 
 import { useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/context/LangContext';
+import { Settings } from 'lucide-react';
 import Logo from '@/components/shared/Logo';
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
 import BottomNavigation from '@/components/shared/BottomNavigation';
@@ -64,10 +65,22 @@ function PublicLayout() {
       <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
           {/* Logo WattU */}
-          <Logo size="md" linkTo="/" />
+          <Logo size="md" linkTo="/home" />
 
-          {/* Language Switcher */}
-          <LanguageSwitcher />
+          {/* Right side: Settings + Language Switcher */}
+          <div className="flex items-center gap-3">
+            {/* Paramètres */}
+            <Link
+              to="/parametres"
+              className="p-2 rounded-lg text-neutral-600 hover:text-primary-600 hover:bg-primary-50 transition-colors"
+              aria-label={t('nav.settings', { defaultValue: 'Paramètres' })}
+            >
+              <Settings className="w-5 h-5" />
+            </Link>
+
+            {/* Language Switcher */}
+            <LanguageSwitcher />
+          </div>
         </div>
       </header>
 

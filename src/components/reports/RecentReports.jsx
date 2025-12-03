@@ -134,9 +134,11 @@ function RecentReports({
                     <h4 className="font-medium text-sm text-neutral-900 truncate capitalize">
                       {report.type?.replace('_', ' ') || 'Type inconnu'}
                     </h4>
-                    <p className="text-xs text-neutral-600 truncate mt-0.5">
-                      {report.description || 'Aucune description'}
-                    </p>
+                    {report.description && (
+                      <p className="text-xs text-neutral-600 truncate mt-0.5">
+                        {report.description}
+                      </p>
+                    )}
                     <div className="flex items-center gap-2 mt-2">
                       <Calendar className="w-3 h-3 text-neutral-400" />
                       <span className="text-xs text-neutral-500">

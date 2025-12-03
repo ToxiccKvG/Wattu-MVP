@@ -37,7 +37,8 @@ export function AuthProvider({ children }) {
   
   /**
    * User actuellement connecté
-   * Structure : { id, name, email, role: 'agent' | 'admin', commune_id }
+   * Structure : { id, name, email, role: 'agent' | 'admin' | null, commune_id }
+   * null = citoyen (pas de role)
    */
   const [user, setUser] = useState(null);
   
@@ -50,6 +51,16 @@ export function AuthProvider({ children }) {
    * Message d'erreur (si erreur pendant login/logout)
    */
   const [error, setError] = useState(null);
+
+  /**
+   * Session Supabase active (source de vérité pour l'authentification)
+   * true = session Supabase existe (utilisateur connecté)
+   * false = pas de session (utilisateur déconnecté)
+   * 
+   * IMPORTANT : hasSession est la source de vérité, pas user
+   * car user peut être null même si session existe (profil pas encore créé)
+   */
+  const [hasSession, setHasSession] = useState(false);
 
   // Hook pour navigation (redirection après login)
   const navigate = useNavigate();
@@ -98,6 +109,7 @@ export function AuthProvider({ children }) {
       if (result.success) {
         // Succès : Stocker le user dans le state
         setUser(result.user);
+        setHasSession(true); // Session créée
 
         // Déterminer la route de redirection selon le rôle
         const redirectPath = authService.getRedirectPath(result.user.role);
@@ -146,9 +158,10 @@ export function AuthProvider({ children }) {
       if (result.success) {
         // Succès : Nettoyer le state
         setUser(null);
+        setHasSession(false); // Session supprimée
 
-        // Redirection vers page d'accueil
-        navigate('/');
+        // Redirection vers /welcome (page d'inscription pour citoyens)
+        navigate('/welcome', { replace: true });
 
         return { success: true };
       } else {
@@ -175,29 +188,58 @@ export function AuthProvider({ children }) {
    * Vérifie si une session Supabase existe
    * 
    * Process :
-   * 1. Appelle authService.getCurrentUser()
-   * 2. Si user trouvé → Stocke dans state (user reste connecté)
-   * 3. Si pas de user → Reste déconnecté
+   * 1. Vérifier la session Supabase directement (source de vérité)
+   * 2. Si session existe → Récupérer le profil utilisateur
+   * 3. Si profil existe → Stocker user + hasSession = true
+   * 4. Si pas de session → hasSession = false, user = null
    */
   const checkAuth = async () => {
     try {
       setLoading(true);
+      console.log('🔍 Vérification de l\'authentification...');
 
-      // Vérifier si session active existe
-      const result = await authService.getCurrentUser();
+      // Étape 1 : Vérifier la session Supabase directement (source de vérité)
+      const session = await authApi.getSession();
+      
+      if (session && session.user) {
+        // Session existe → Utilisateur est connecté
+        console.log('✅ Session trouvée:', session.user.email);
+        setHasSession(true);
 
-      if (result.success && result.user) {
-        // Session active trouvée : User est connecté
-        setUser(result.user);
+        // Étape 2 : Récupérer le profil utilisateur
+        const result = await authService.getCurrentUser();
+
+        if (result.success && result.user) {
+          // Profil trouvé ou créé → Stocker user
+          console.log('✅ Profil utilisateur trouvé:', result.user.role);
+          setUser(result.user);
+        } else {
+          // Session existe mais pas de profil → Créer profil minimal
+          // (getCurrentUser devrait déjà gérer ça, mais au cas où)
+          console.log('⚠️ Pas de profil, création d\'un profil minimal');
+          setUser({
+            id: session.user.id,
+            email: session.user.email,
+            name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Utilisateur',
+            role: 'citizen', // Citoyen par défaut
+            commune_id: null,
+            age: null,
+            phone: null,
+          });
+        }
       } else {
-        // Pas de session : User déconnecté
+        // Pas de session → Utilisateur déconnecté
+        console.log('❌ Pas de session');
+        setHasSession(false);
         setUser(null);
       }
     } catch (err) {
       // Si erreur, considérer comme déconnecté
-      console.error('Erreur vérification auth:', err);
+      console.error('❌ Erreur vérification auth:', err);
+      setHasSession(false);
       setUser(null);
     } finally {
+      console.log('✅ Vérification terminée');
       setLoading(false);
     }
   };
@@ -251,6 +293,15 @@ export function AuthProvider({ children }) {
         // User vient de se déconnecter (via autre onglet ou expiration)
         console.log('👋 User signed out');
         setUser(null);
+        setHasSession(false); // Session supprimée
+      }
+      
+      // Gérer aussi les cas de token refresh (session toujours active)
+      if (event === 'TOKEN_REFRESHED' && session) {
+        console.log('🔄 Token rafraîchi');
+        setHasSession(true);
+        // Re-vérifier le profil utilisateur
+        checkAuth();
       }
       // Note : Les refresh de token sont gérés automatiquement par Supabase
     });
@@ -265,12 +316,73 @@ export function AuthProvider({ children }) {
   // VALEURS DU CONTEXT (accessibles via useAuth())
   // ═══════════════════════════════════════════════════════════
 
+  // ═══════════════════════════════════════════════════════════════════
+  // VOICE USER HELPERS (Authentification vocale)
+  // ═══════════════════════════════════════════════════════════════════
+
+  /**
+   * Récupère l'utilisateur vocal depuis localStorage
+   * @returns {Object|null} - { id, name, prenom, authenticated, enrolledAt, lastVerifiedAt }
+   */
+  const getVoiceUser = () => {
+    try {
+      const stored = localStorage.getItem('voiceUser');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  /**
+   * Vérifie si un utilisateur vocal est authentifié
+   * @returns {boolean}
+   */
+  const isVoiceAuthenticated = () => {
+    const voiceUser = getVoiceUser();
+    return voiceUser?.authenticated === true;
+  };
+
+  /**
+   * Récupère l'ID de l'utilisateur vocal
+   * @returns {string|null}
+   */
+  const getVoiceUserId = () => {
+    const voiceUser = getVoiceUser();
+    return voiceUser?.id || null;
+  };
+
+  /**
+   * Déconnexion de l'utilisateur vocal
+   */
+  const logoutVoiceUser = () => {
+    localStorage.removeItem('voiceUser');
+    localStorage.removeItem('pendingVoiceUser');
+  };
+
+  /**
+   * Met à jour les informations de l'utilisateur vocal dans localStorage
+   * @param {Object} updates - Champs à mettre à jour (ex: { prenom, name, phone })
+   * @returns {Object|null} - Nouvel objet voiceUser ou null en cas d'erreur
+   */
+  const updateVoiceUser = (updates) => {
+    try {
+      const current = getVoiceUser() || {};
+      const next = { ...current, ...updates };
+      localStorage.setItem('voiceUser', JSON.stringify(next));
+      return next;
+    } catch (err) {
+      console.error('Erreur updateVoiceUser:', err);
+      return null;
+    }
+  };
+
   const value = {
     // État
-    user,                              // User connecté ou null
+    user,                              // User connecté ou null (profil depuis table users)
     loading,                           // true pendant chargement
     error,                             // Message d'erreur ou null
-    isAuthenticated: !!user,           // true si user connecté
+    hasSession,                        // true si session Supabase active (source de vérité)
+    isAuthenticated: hasSession,       // true si session Supabase existe (pas seulement user)
     
     // Fonctions
     login,                             // Connexion
@@ -279,10 +391,20 @@ export function AuthProvider({ children }) {
     clearError,                        // Nettoyer erreur
     
     // Helpers (dérivés de user)
-    userRole: user?.role || null,     // 'agent' | 'admin' | null
+    userRole: user?.role || null,      // 'agent' | 'admin' | 'citizen'
     userName: user?.name || null,      // Nom de l'utilisateur
     userEmail: user?.email || null,    // Email de l'utilisateur
     communeId: user?.commune_id || null, // ID commune (pour agents)
+    isCitizen: hasSession && user?.role === 'citizen', // true si citoyen
+    isAgent: hasSession && user?.role === 'agent', // true si agent
+    isAdmin: hasSession && user?.role === 'admin', // true si admin
+
+    // Voice User Helpers (Authentification vocale biométrique)
+    getVoiceUser,                      // Récupère l'utilisateur vocal depuis localStorage
+    isVoiceAuthenticated,              // Vérifie si un utilisateur vocal est authentifié
+    getVoiceUserId,                    // Récupère l'ID de l'utilisateur vocal
+    logoutVoiceUser,                   // Déconnexion de l'utilisateur vocal
+    updateVoiceUser,                   // Met à jour les infos de l'utilisateur vocal
   };
 
   // ═══════════════════════════════════════════════════════════

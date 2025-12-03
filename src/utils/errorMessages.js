@@ -20,45 +20,56 @@ export const authErrorMessages = {
     fr: 'Email ou mot de passe incorrect',
     wo: 'Email walla mot de passe dañu xamul',
   },
-  
+
   // User introuvable (on donne le MÊME message que credentials invalides pour la sécurité)
   'User not found': {
     fr: 'Email ou mot de passe incorrect',
     wo: 'Email walla mot de passe dañu xamul',
   },
-  
+
   // Email non confirmé
   'Email not confirmed': {
     fr: 'Veuillez confirmer votre email avant de vous connecter',
     wo: 'Dafay wara confirmer sa email balaa dugge',
   },
-  
+
   // Session expirée (JWT invalide)
   'Invalid JWT': {
     fr: 'Votre session a expiré. Veuillez vous reconnecter',
     wo: 'Sa session a expiré. Dafay wara dugg bu bees',
   },
-  
+
   'JWT expired': {
     fr: 'Votre session a expiré. Veuillez vous reconnecter',
     wo: 'Sa session a expiré. Dafay wara dugg bu bees',
   },
-  
+
   // Trop de tentatives de connexion
   'Too many requests': {
     fr: 'Trop de tentatives. Veuillez réessayer dans quelques minutes',
     wo: 'Yàgg na lool. Jéematul ci ay simili',
   },
-  
+
   // Erreur réseau
   'Network request failed': {
     fr: 'Erreur de connexion. Vérifiez votre connexion internet',
     wo: 'Erreur connexion. Xoolal sa internet',
   },
-  
+
   'Failed to fetch': {
     fr: 'Erreur de connexion. Vérifiez votre connexion internet',
     wo: 'Erreur connexion. Xoolal sa internet',
+  },
+
+  // Erreurs de contrainte base de données
+  'new row violates row-level security policy': {
+    fr: 'Erreur de permissions. Impossible de créer votre profil.',
+    wo: 'Njumte ci permissions. Man naa defar sa profil.',
+  },
+
+  'duplicate key value violates unique constraint': {
+    fr: 'Cet email est déjà utilisé. Veuillez vous connecter.',
+    wo: 'Email bi am na. Dafay wara dugg.',
   },
 };
 
@@ -85,17 +96,40 @@ export const genericErrorMessages = {
 export function getSecureErrorMessage(error, language = 'fr') {
   // Extraire le message de l'erreur
   const errorMessage = typeof error === 'string' ? error : error?.message || '';
-  
+  const errorCode = error?.code || '';
+  const errorDetails = error?.details || '';
+
   // Log technique (visible uniquement en développement)
   if (process.env.NODE_ENV === 'development') {
-    console.error('🔴 Erreur technique (ne pas afficher à l\'user):', error);
+    console.error('🔴 Erreur technique (ne pas afficher à l\'user):', {
+      message: errorMessage,
+      code: errorCode,
+      details: errorDetails,
+      hint: error?.hint,
+      fullError: error,
+    });
   }
-  
-  // Chercher dans le mapping
+
+  // Chercher dans le mapping (message exact)
   if (authErrorMessages[errorMessage]) {
     return authErrorMessages[errorMessage][language] || authErrorMessages[errorMessage].fr;
   }
-  
+
+  // Chercher par code d'erreur (ex: 23505 = unique constraint violation)
+  if (errorCode === '23505') {
+    return authErrorMessages['duplicate key value violates unique constraint']?.[language] 
+      || authErrorMessages['duplicate key value violates unique constraint']?.fr
+      || genericErrorMessages[language];
+  }
+
+  // Chercher par mots-clés dans le message (pour erreurs RLS)
+  const lowerMessage = errorMessage.toLowerCase();
+  if (lowerMessage.includes('row-level security') || lowerMessage.includes('policy')) {
+    return authErrorMessages['new row violates row-level security policy']?.[language]
+      || authErrorMessages['new row violates row-level security policy']?.fr
+      || genericErrorMessages[language];
+  }
+
   // Si erreur inconnue, retourner message générique
   return genericErrorMessages[language] || genericErrorMessages.fr;
 }
@@ -109,17 +143,17 @@ export const validationErrorMessages = {
     fr: 'L\'email est obligatoire',
     wo: 'Email a obligatoire',
   },
-  
+
   emailInvalid: {
     fr: 'L\'email n\'est pas valide',
     wo: 'Email bi xamuñu ko',
   },
-  
+
   passwordRequired: {
     fr: 'Le mot de passe est obligatoire',
     wo: 'Mot de passe a obligatoire',
   },
-  
+
   passwordTooShort: {
     fr: 'Le mot de passe doit contenir au moins 6 caractères',
     wo: 'Mot de passe bi dafay wara am 6 caractères',

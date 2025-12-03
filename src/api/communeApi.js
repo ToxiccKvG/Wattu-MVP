@@ -43,7 +43,7 @@ export async function getAllCommunes(options = {}) {
       .order(orderBy, { ascending });
 
     if (error) {
-      console.error('❌ Erreur récupération communes:', error);
+      console.error(' Erreur récupération communes:', error);
       return { data: null, error };
     }
 
@@ -51,7 +51,7 @@ export async function getAllCommunes(options = {}) {
     return { data, error: null };
 
   } catch (err) {
-    console.error('❌ Erreur inattendue getAllCommunes:', err);
+    console.error(' Erreur inattendue getAllCommunes:', err);
     return {
       data: null,
       error: {
@@ -91,15 +91,15 @@ export async function getCommuneById(id) {
       .single();
 
     if (error) {
-      console.error('❌ Erreur récupération commune:', error);
+      console.error(' Erreur récupération commune:', error);
       return { data: null, error };
     }
 
-    console.log('✅ Commune récupérée:', data.name);
+    console.log('Commune récupérée:', data.name);
     return { data, error: null };
 
   } catch (err) {
-    console.error('❌ Erreur inattendue getCommuneById:', err);
+    console.error(' Erreur inattendue getCommuneById:', err);
     return {
       data: null,
       error: {
@@ -143,15 +143,15 @@ export async function getCommunesByRegion(region) {
       .order('name', { ascending: true });
 
     if (error) {
-      console.error('❌ Erreur récupération communes par région:', error);
+      console.error(' Erreur récupération communes par région:', error);
       return { data: null, error };
     }
 
-    console.log(`✅ ${data.length} communes récupérées pour la région ${region}`);
+    console.log(` ${data.length} communes récupérées pour la région ${region}`);
     return { data, error: null };
 
   } catch (err) {
-    console.error('❌ Erreur inattendue getCommunesByRegion:', err);
+    console.error('Erreur inattendue getCommunesByRegion:', err);
     return {
       data: null,
       error: {
@@ -183,11 +183,11 @@ export async function getAllRegions() {
     // Extraire les régions uniques et les trier
     const regions = [...new Set(communes.map(c => c.region))].sort();
 
-    console.log(`✅ ${regions.length} régions trouvées`);
+    console.log(` ${regions.length} régions trouvées`);
     return { data: regions, error: null };
 
   } catch (err) {
-    console.error('❌ Erreur inattendue getAllRegions:', err);
+    console.error('Erreur inattendue getAllRegions:', err);
     return {
       data: null,
       error: {
@@ -227,15 +227,15 @@ export async function searchCommunes(searchTerm) {
       .order('name', { ascending: true });
 
     if (error) {
-      console.error('❌ Erreur recherche communes:', error);
+      console.error(' Erreur recherche communes:', error);
       return { data: null, error };
     }
 
-    console.log(`✅ ${data.length} communes trouvées pour "${searchTerm}"`);
+    console.log(`${data.length} communes trouvées pour "${searchTerm}"`);
     return { data, error: null };
 
   } catch (err) {
-    console.error('❌ Erreur inattendue searchCommunes:', err);
+    console.error(' Erreur inattendue searchCommunes:', err);
     return {
       data: null,
       error: {
@@ -253,4 +253,5 @@ export default {
   getAllRegions,
   searchCommunes
 };
+
 
