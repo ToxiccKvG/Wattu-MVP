@@ -2,6 +2,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { Mic } from 'lucide-react';
 import Logo from '@/components/shared/Logo';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -25,49 +26,45 @@ function Welcome() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-primary-50 via-white to-neutral-50 px-4 py-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-black px-4 py-8">
       {/* Logo */}
       <div className="mb-8 text-center">
         <div className="flex justify-center mb-4">
           <Logo size="xl" withLink={false} />
         </div>
-        <h1 className="text-2xl font-bold text-neutral-900 mb-2">
+        <h1 className="text-2xl font-bold text-white mb-2">
           {t('welcome.title', { defaultValue: 'Bienvenue sur WattU' })}
         </h1>
-        <p className="text-sm text-neutral-600">
+        <p className="text-sm text-white">
           {t('welcome.subtitle', { defaultValue: 'Créez votre compte pour signaler les problèmes de votre ville' })}
         </p>
       </div>
 
       {/* Authentification vocale */}
-      <Card className="w-full max-w-md">
-        <CardContent className="pt-6 space-y-6">
-          {/* Explication simple */}
-          <div className="text-center space-y-3">
-            <p className="text-base text-neutral-700 font-medium">
-              Authentification par reconnaissance vocale
-            </p>
-            <p className="text-sm text-neutral-600 leading-relaxed">
-              Votre voix est unique. Dites simplement votre nom et prénom pour créer votre compte. 
-              Votre voix servira ensuite à vous identifier de manière sécurisée.
-            </p>
+      <Card className="w-full max-w-md shadow-lg">
+        <CardContent className="pt-8 pb-8 space-y-6">
+          {/* Icône visuelle */}
+          <div className="flex justify-center">
+            <div className="rounded-full bg-primary-100 p-4">
+              <Mic className="w-8 h-8 text-primary-600" />
+            </div>
           </div>
 
           {/* Boutons d'action */}
           <div className="flex flex-col gap-3">
             <Button
               variant="default"
-              className="w-full"
+              className="w-full h-12 text-base font-semibold"
               onClick={() => navigate('/voice-enroll')}
             >
-              {t('welcome.startVoiceSignup', { defaultValue: 'Nouvelle inscription' })}
+              {t('welcome.startVoiceSignup', { defaultValue: "M'enroller" })}
             </Button>
               <Button
                 variant="outline"
-                className="w-full"
+              className="w-full h-12 text-base"
               onClick={() => navigate('/voice-verify')}
               >
-              {t('welcome.voiceLogin', { defaultValue: 'Déjà inscrit ? Se connecter' })}
+              {t('welcome.voiceLogin', { defaultValue: 'Me connecter' })}
               </Button>
             </div>
         </CardContent>
@@ -75,7 +72,7 @@ function Welcome() {
 
       {/* Footer */}
       <div className="mt-8 text-center">
-        <p className="text-xs text-neutral-500">
+        <p className="text-xs text-white">
           © 2025 WattU · {t('welcome.version', { defaultValue: 'v1.0.0' })}
         </p>
       </div>

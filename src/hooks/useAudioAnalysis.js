@@ -134,7 +134,7 @@ export function useAudioAnalysis(options = {}) {
       try {
         geminiClientRef.current = new GoogleGenAI({ apiKey: geminiConfig.apiKey });
       } catch (err) {
-        console.error('❌ Erreur initialisation Gemini STT:', err);
+        console.error(' Erreur initialisation Gemini STT:', err);
         return null;
       }
     }

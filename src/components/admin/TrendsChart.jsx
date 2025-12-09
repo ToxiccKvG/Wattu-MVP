@@ -31,10 +31,10 @@ function TrendsChart({ trends, loading }) {
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-primary-600" />
+      <Card className="bg-gradient-to-br from-indigo-50/50 via-white to-blue-50/30 border-2 border-indigo-200/50 shadow-md">
+        <CardHeader className="bg-gradient-to-r from-indigo-50 to-transparent border-b border-indigo-200/30">
+          <CardTitle className="flex items-center gap-2 text-indigo-900">
+            <TrendingUp className="w-5 h-5 text-indigo-600" />
             {t('trends.title', { defaultValue: 'Évolution des signalements' })}
           </CardTitle>
         </CardHeader>
@@ -47,10 +47,10 @@ function TrendsChart({ trends, loading }) {
 
   if (!trends || trends.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-primary-600" />
+      <Card className="bg-gradient-to-br from-indigo-50/50 via-white to-blue-50/30 border-2 border-indigo-200/50 shadow-md">
+        <CardHeader className="bg-gradient-to-r from-indigo-50 to-transparent border-b border-indigo-200/30">
+          <CardTitle className="flex items-center gap-2 text-indigo-900">
+            <TrendingUp className="w-5 h-5 text-indigo-600" />
             {t('trends.title', { defaultValue: 'Évolution des signalements' })}
           </CardTitle>
         </CardHeader>
@@ -100,17 +100,17 @@ function TrendsChart({ trends, loading }) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-primary-600" />
+    <Card className="bg-gradient-to-br from-indigo-50/50 via-white to-blue-50/30 border-2 border-indigo-200/50 shadow-md">
+      <CardHeader className="bg-gradient-to-r from-indigo-50 to-transparent border-b border-indigo-200/30">
+        <CardTitle className="flex items-center gap-2 text-indigo-900">
+          <TrendingUp className="w-5 h-5 text-indigo-600" />
           {t('trends.title', { defaultValue: 'Évolution des signalements' })}
         </CardTitle>
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-indigo-700 font-medium">
           {t('trends.subtitle', { defaultValue: '30 derniers jours' })}
         </p>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <Suspense 
           fallback={
             <div className="h-80 flex items-center justify-center">

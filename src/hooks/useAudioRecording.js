@@ -21,6 +21,9 @@ export function useAudioRecording(options = {}) {
   const streamRef = useRef(null);
   const chunksRef = useRef([]);
   const timerRef = useRef(null);
+  const analyserRef = useRef(null);
+  const audioContextRef = useRef(null);
+  const animationFrameRef = useRef(null);
 
   const [isSupported, setIsSupported] = useState(false);
   const [permission, setPermission] = useState('prompt');
@@ -30,6 +33,7 @@ export function useAudioRecording(options = {}) {
   const [audioBlob, setAudioBlob] = useState(null);
   const [audioUrl, setAudioUrl] = useState(null);
   const [error, setError] = useState(null);
+  const [volume, setVolume] = useState(0); // Volume entre 0 et 1
 
   /**
    * Vérifie la disponibilité des APIs requises
@@ -114,12 +118,48 @@ export function useAudioRecording(options = {}) {
   }, [isSupported]);
 
   /**
+   * Analyser le volume en temps réel
+   */
+  const analyzeVolume = useCallback(() => {
+    if (!analyserRef.current) {
+      return;
+    }
+
+    const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+    analyserRef.current.getByteFrequencyData(dataArray);
+    
+    // Calculer le volume moyen
+    const average = dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length;
+    const normalizedVolume = Math.min(1, average / 128); // Normaliser entre 0 et 1
+    setVolume(normalizedVolume);
+
+    // Continuer l'analyse si on enregistre toujours
+    if (analyserRef.current) {
+      animationFrameRef.current = requestAnimationFrame(analyzeVolume);
+    }
+  }, []);
+
+  /**
    * Nettoyer flux/timer/audioURL
    */
   const cleanup = useCallback(() => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
+    }
+
+    if (analyserRef.current) {
+      analyserRef.current = null;
+    }
+
+    if (audioContextRef.current) {
+      audioContextRef.current.close().catch(console.error);
+      audioContextRef.current = null;
     }
 
     if (mediaRecorderRef.current) {
@@ -135,6 +175,7 @@ export function useAudioRecording(options = {}) {
     }
 
     chunksRef.current = [];
+    setVolume(0);
   }, []);
 
   /**
@@ -192,6 +233,16 @@ export function useAudioRecording(options = {}) {
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         streamRef.current = stream;
 
+        // Créer l'analyseur audio pour le volume
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        audioContextRef.current = audioContext;
+        const source = audioContext.createMediaStreamSource(stream);
+        const analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        analyser.smoothingTimeConstant = 0.8;
+        source.connect(analyser);
+        analyserRef.current = analyser;
+
         const recorder = new MediaRecorder(stream, { mimeType, ...overrides.recorderOptions });
         mediaRecorderRef.current = recorder;
 
@@ -219,6 +270,10 @@ export function useAudioRecording(options = {}) {
 
         recorder.start(1000); // collecter en chunks toutes les secondes
         setIsRecording(true);
+        setVolume(0);
+
+        // Démarrer l'analyse du volume
+        analyzeVolume();
 
         timerRef.current = setInterval(() => {
           setDuration((prev) => {
@@ -308,6 +363,7 @@ export function useAudioRecording(options = {}) {
     audioBlob,
     audioUrl,
     error,
+    volume, // Volume en temps réel (0-1)
     startRecording,
     stopRecording,
     resetRecording,

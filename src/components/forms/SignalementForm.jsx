@@ -1,14 +1,12 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Loader2, Mic, Square, RefreshCcw, AlertCircle, Check } from 'lucide-react';
+import { Loader2, Mic, Square, RefreshCcw, AlertCircle, Check, Camera, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import LocationPicker from '@/components/maps/LocationPicker';
 import SuccessModal from '@/components/shared/SuccessModal';
 import useAudioRecording from '@/hooks/useAudioRecording';
 import useGeolocation from '@/hooks/useGeolocation';
-import LocationConfirmationCard from '@/components/shared/LocationConfirmationCard';
-import PhotoBottomSheet from '@/components/shared/PhotoBottomSheet';
+import useImageUpload from '@/hooks/useImageUpload';
 import { useAuth } from '@/context/AuthContext';
 import * as reportService from '@/services/reportService';
 
@@ -17,36 +15,63 @@ import * as reportService from '@/services/reportService';
  * 
  * Nouveau flux simplifié (SANS analyse audio Gemini) :
  * 1. Enregistrement audio (30s max)
- * 2. Confirmation de localisation GPS
- * 3. Sélection photo optionnelle (bottom sheet)
+ * 2. Récupération automatique de la localisation GPS (en arrière-plan, sans affichage)
+ * 3. Sélection photo optionnelle (directement dans le formulaire)
  * 4. Soumission directe avec audio + infos citoyen depuis profil
  * 
  * Les informations du citoyen (nom, téléphone, commune, adresse, email) sont
  * automatiquement récupérées depuis le profil utilisateur connecté.
  * L'audio est envoyé directement à Supabase Storage sans transcription.
  * 
+ * @param {string} [props.initialType] - Type pré-sélectionné depuis l'URL (ex: 'securite', 'eclairage', 'dechets')
+ * 
  * @example
- * <SignalementForm />
+ * <SignalementForm initialType="securite" />
  */
-function SignalementForm() {
+function SignalementForm({ initialType = null }) {
   const { t } = useTranslation('common');
   const { user, getVoiceUser, isVoiceAuthenticated } = useAuth(); // Récupérer les infos du citoyen connecté
   const audioRecording = useAudioRecording({ maxDuration: 30 });
   const geolocation = useGeolocation();
+  const imageUpload = useImageUpload();
 
   const [step, setStep] = useState('idle'); // idle | recording | location | photo | submitting
-  const [showManualLocation, setShowManualLocation] = useState(false);
-  const [locationConfirmed, setLocationConfirmed] = useState(false);
   const [isManualPosition, setIsManualPosition] = useState(false);
-  const [showPhotoSheet, setShowPhotoSheet] = useState(false);
-  const [selectedPhotoFile, setSelectedPhotoFile] = useState(null);
-  const [reportType, setReportType] = useState(''); // Type choisi par le citoyen
+  const [reportType, setReportType] = useState(initialType || ''); // Type choisi par le citoyen ou depuis l'URL
   const [position, setPosition] = useState(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [createdReport, setCreatedReport] = useState(null);
+
+  // Mettre à jour le type si initialType change
+  useEffect(() => {
+    if (initialType) {
+      setReportType(initialType);
+    }
+  }, [initialType]);
+
+  /**
+   * Obtenir le label du type pour l'affichage
+   * Utilise les labels de home.types pour les types venant de la page d'accueil
+   */
+  const getTypeLabel = (type) => {
+    if (!type) return '';
+    
+    // Si le type vient de la page d'accueil (initialType), utiliser les labels spécifiques
+    if (initialType) {
+      const typeMap = {
+        'securite': t('home.types.agression', { defaultValue: 'Agression' }),
+        'eclairage': t('home.types.eclairage', { defaultValue: 'Eclairage' }),
+        'dechets': t('home.types.dechets', { defaultValue: 'Déchets' }),
+      };
+      return typeMap[type] || t(`report_types.${type}`, { defaultValue: type });
+    }
+    
+    // Sinon, utiliser les labels standards
+    return t(`report_types.${type}`, { defaultValue: type });
+  };
 
   /**
    * Valider les données avant soumission
@@ -91,8 +116,8 @@ function SignalementForm() {
     setSubmitError(null);
     setStep('submitting');
     
-    // Utiliser photoFile passé en paramètre OU selectedPhotoFile (fallback)
-    const finalPhotoFile = photoFile || selectedPhotoFile;
+    // Utiliser photoFile passé en paramètre OU imageUpload.imageFile (fallback)
+    const finalPhotoFile = photoFile || imageUpload.imageFile;
 
     try {
       console.log('📤 Soumission du signalement...');
@@ -176,14 +201,11 @@ function SignalementForm() {
 
   const resetForm = () => {
     setPosition(null);
-    setSelectedPhotoFile(null);
     setSubmitError(null);
     setStep('idle');
-    setShowManualLocation(false);
-    setLocationConfirmed(false);
     setIsManualPosition(false);
-    setShowPhotoSheet(false);
     audioRecording.resetRecording();
+    imageUpload.removeImage();
   };
 
   const handleStartRecording = async () => {
@@ -194,58 +216,42 @@ function SignalementForm() {
     const result = await audioRecording.startRecording();
     if (result.success) {
       setStep('recording');
-      setLocationConfirmed(false);
-      setShowManualLocation(false);
       geolocation.startAutoCapture();
     }
   };
 
   const handleStopRecording = () => {
     audioRecording.stopRecording();
-    geolocation.cancelAutoCapture();
-    // Après l'arrêt de l'enregistrement, passer directement à la confirmation de localisation
+    // La localisation est déjà en cours de capture automatique depuis handleStartRecording
+    // Attendre que la position soit disponible, puis passer directement à la photo
+    if (position) {
+      // Si on a déjà une position, passer directement à la photo
+      setStep('photo');
+    } else {
+      // Sinon, attendre que la position soit capturée
     setStep('location');
+    }
   };
 
   const handleRetryRecording = () => {
     resetForm();
   };
 
-  const handleToggleManualLocation = () => {
-    setShowManualLocation((prev) => !prev);
-    setIsManualPosition(true);
-  };
-
-  const handleLocationConfirmed = () => {
-    setLocationConfirmed(true);
-    // Après confirmation de la localisation, ouvrir le bottom sheet pour la photo
-    setStep('photo');
-    setShowPhotoSheet(true);
-  };
-
-  const handlePhotoSelected = (file) => {
-    setSelectedPhotoFile(file);
-    setShowPhotoSheet(false);
-    // Après sélection de la photo, soumettre automatiquement
-    // Passer le fichier directement car setState est asynchrone
-    handleSubmit(file);
-  };
-
-  const handlePhotoSkipped = () => {
-    setShowPhotoSheet(false);
-    // Si l'utilisateur passe la photo, soumettre directement
-    handleSubmit();
-  };
-
   // Mettre à jour la position quand le GPS capture une position
   useEffect(() => {
     if (geolocation.position && !isManualPosition) {
-      setPosition({
+      const newPosition = {
         lat: geolocation.position.latitude,
         lng: geolocation.position.longitude,
-      });
+      };
+      setPosition(newPosition);
+      
+      // Si on est en attente de localisation après l'enregistrement, passer directement à la photo
+      if (step === 'location' && audioRecording.audioBlob && !audioRecording.isRecording) {
+        setStep('photo');
+      }
     }
-  }, [geolocation.position, isManualPosition]);
+  }, [geolocation.position, isManualPosition, step, audioRecording.audioBlob, audioRecording.isRecording]);
 
   const recordingProgress = audioRecording.maxDuration
     ? Math.min(100, Math.round((audioRecording.duration / audioRecording.maxDuration) * 100))
@@ -277,11 +283,11 @@ function SignalementForm() {
                   type="button"
                   onClick={handleStartRecording}
                   disabled={!audioRecording.isSupported || step === 'submitting' || step === 'photo'}
-                  className="flex-1 md:flex-none"
+                  className="flex-1 md:flex-none bg-black hover:bg-neutral-900 text-white"
                 >
                   <Mic className="mr-2 h-4 w-4" />
                   {step === 'idle'
-                    ? t('voice.start_recording', { defaultValue: 'Commencer l’enregistrement' })
+                    ? t('voice.start_recording', { defaultValue: "Commencer l'enregistrement" })
                     : t('voice.re_record', { defaultValue: 'Réenregistrer' })}
                 </Button>
               ) : (
@@ -315,7 +321,8 @@ function SignalementForm() {
           </div>
         </section>
 
-        {/* Choix du type de problème */}
+        {/* Choix du type de problème - Masqué si type déjà fourni depuis l'URL */}
+        {!initialType && (
         <section className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-neutral-900">
@@ -352,38 +359,126 @@ function SignalementForm() {
             ))}
           </div>
         </section>
+        )}
 
-        {/* Confirmation de localisation - affichée après enregistrement audio */}
-        {step === 'location' && audioRecording.audioBlob && (
-          <section className="space-y-4 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-          <LocationConfirmationCard
-            status={geolocation.autoCaptureStatus}
-            elapsed={geolocation.autoCaptureElapsed}
-            position={position}
-            accuracy={geolocation.position?.accuracy}
-            error={geolocation.autoCaptureError}
-            isConfirmed={locationConfirmed}
-            onConfirm={handleLocationConfirmed}
-            onRetry={() => geolocation.startAutoCapture()}
-            onManualSelect={handleToggleManualLocation}
-          />
-
-            {showManualLocation && (
-              <LocationPicker
-                value={position}
-                onChange={(pos) => {
-                  setIsManualPosition(true);
-                  setPosition(pos);
-                  setLocationConfirmed(true);
-                  handleLocationConfirmed();
-                }}
-                error={null}
-              />
-            )}
+        {/* Affichage du type sélectionné si fourni depuis l'URL */}
+        {initialType && reportType && (
+          <section className="rounded-2xl border border-primary-200 bg-primary-50 p-4 shadow-sm">
+            <div className="flex items-center gap-2">
+              <Check className="w-5 h-5 text-primary-600" />
+              <p className="text-sm font-medium text-primary-900">
+                {t('report.type_selected', { defaultValue: 'Type sélectionné' })}: <span className="font-semibold">
+                  {getTypeLabel(reportType)}
+                </span>
+              </p>
+            </div>
           </section>
         )}
 
-        {/* Erreur de soumission */}
+        {/* La localisation est récupérée automatiquement en arrière-plan, pas d'affichage */}
+
+        {/* Section photo optionnelle - affichée après l'enregistrement audio */}
+        {step === 'photo' && audioRecording.audioBlob && position && (
+          <section className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-neutral-900">
+                {t('photo_sheet.title', { defaultValue: 'Ajouter une photo' })}
+              </h3>
+              <span className="text-xs text-neutral-500 font-normal">
+                {t('form.optional', { defaultValue: 'Optionnel' })}
+              </span>
+            </div>
+            <p className="text-sm text-neutral-600">
+              {t('photo_sheet.description', {
+                defaultValue: 'Prenez une photo pour illustrer le problème (optionnel)',
+              })}
+            </p>
+
+            {/* Zone de sélection de photo */}
+            {!imageUpload.imagePreview ? (
+              <label
+                htmlFor="photo-input"
+                className="block w-full p-8 border-2 border-dashed border-neutral-300 rounded-xl hover:border-primary-500 transition-colors cursor-pointer"
+              >
+                <div className="flex flex-col items-center gap-3">
+                  {imageUpload.isCompressing ? (
+                    <>
+                      <Loader2 className="w-12 h-12 text-primary-600 animate-spin" />
+                      <p className="text-sm text-primary-600 font-medium">
+                        {t('form.compressing', { defaultValue: 'Compression en cours...' })}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <Camera className="w-12 h-12 text-neutral-400" />
+                      <p className="text-sm text-neutral-600 font-medium">
+                        {t('photo_sheet.select_photo', {
+                          defaultValue: 'Touchez pour prendre une photo',
+                        })}
+                      </p>
+                      <p className="text-xs text-neutral-500">
+                        JPEG, PNG, WebP (max 5MB)
+                      </p>
+                    </>
+                  )}
+                </div>
+                <input
+                  id="photo-input"
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={imageUpload.selectImage}
+                  className="hidden"
+                  disabled={imageUpload.isCompressing}
+          />
+              </label>
+            ) : (
+              <div className="relative">
+                <img
+                  src={imageUpload.imagePreview}
+                  alt="Preview"
+                  className="w-full h-64 object-cover rounded-xl border-2 border-neutral-200"
+                />
+                <button
+                  type="button"
+                  onClick={imageUpload.removeImage}
+                  className="absolute top-3 right-3 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg"
+                  aria-label={t('photo_sheet.remove_photo', {
+                    defaultValue: 'Supprimer la photo',
+                  })}
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
+            {imageUpload.error && (
+              <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+                <p className="text-sm text-red-700">{imageUpload.error.message}</p>
+              </div>
+            )}
+
+            {/* Bouton de soumission */}
+            <div className="flex flex-col gap-3 pt-2">
+              <Button
+                onClick={() => handleSubmit()}
+                className="w-full"
+                disabled={isSubmitting || imageUpload.isCompressing}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {t('form.submitting', { defaultValue: 'Envoi en cours...' })}
+                  </>
+                ) : (
+                  t('form.submit', { defaultValue: 'Envoyer le signalement' })
+                )}
+              </Button>
+            </div>
+          </section>
+        )}
+
+        {/* Erreur de soumission je ne ferais peut etre pas cette erreur avec cela mais let's go */}
         {submitError && (
           <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-sm text-red-700">{submitError}</p>
@@ -402,14 +497,6 @@ function SignalementForm() {
           </div>
         )}
       </div>
-
-      {/* Bottom Sheet pour la photo */}
-      <PhotoBottomSheet
-        open={showPhotoSheet}
-        onClose={() => setShowPhotoSheet(false)}
-        onPhotoSelected={handlePhotoSelected}
-        onSkip={handlePhotoSkipped}
-      />
 
       {/* Modal de succès */}
       <SuccessModal

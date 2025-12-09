@@ -185,7 +185,8 @@
         "version": "v1.0.0",
         "voiceOption": "Vous pouvez aussi vous inscrire avec l'agent IA",
         "voiceOptionDesc": "L'agent IA vous posera des questions et vous répondrez vocalement",
-        "startVoiceSignup": "Commencer l'inscription vocale"
+        "startVoiceSignup": "M'enroller",
+        "voiceLogin": "Me connecter"
     },
     "dashboard": {
         "logout": "Déconnexion",
@@ -209,26 +210,10 @@
             "subtitle": "Aidez votre commune à améliorer votre quotidien",
             "cta": "Faire un signalement"
         },
-        "quick": {
-            "report": {
-                "title": "Nouveau signalement",
-                "desc": "Signalez un problème dans votre ville"
-            },
-            "map": {
-                "title": "Voir la carte",
-                "desc": "Découvrez les signalements de votre ville"
-            },
-            "dashboard": {
-                "title": "Mes signalements",
-                "desc": "Consultez l'historique de vos signalements"
-            }
-        },
-        "howto": {
-            "title": "Comment ça marche ?",
-            "step1": "Décrivez le problème",
-            "step2": "Ajoutez une photo",
-            "step3": "Indiquez l'emplacement",
-            "step4": "Votre commune s'en occupe"
+        "types": {
+            "agression": "Agression",
+            "eclairage": "Eclairage",
+            "dechets": "Déchets"
         }
     },
     "map": {
@@ -248,7 +233,8 @@
         }
     },
     "report": {
-        "type_section_title": "Quel type de problème signalez-vous ?"
+        "type_section_title": "Quel type de problème signalez-vous ?",
+        "type_selected": "Type sélectionné"
     },
     "settings": {
         "title": "Paramètres",
@@ -494,7 +480,8 @@
         "enroll": {
             "title": "Inscription vocale",
             "instruction": "Dites votre nom et prénom",
-            "example": "Exemple: \"Je m'appelle Ousmane Dafara\"",
+            "example": "Mouhamed Ndiaye",
+            "exampleLabel": "Exemple",
             "recording": "Enregistrement en cours...",
             "processing": "Analyse de votre voix...",
             "confirm": "Confirmez votre nom",
@@ -506,12 +493,14 @@
             "retry": "Réessayer",
             "saving": "Création du compte...",
             "success": "Inscription réussie !",
+            "accountCreated": "Votre compte a été bien créé",
             "errors": {
                 "recordingFailed": "Erreur lors de l'enregistrement",
                 "transcriptionFailed": "Impossible de transcrire l'audio. Veuillez saisir votre nom manuellement.",
                 "nameExtractionFailed": "Impossible d'extraire le nom. Veuillez saisir votre nom manuellement.",
                 "enrollmentFailed": "Erreur lors de l'inscription. Veuillez réessayer.",
-                "microphoneDenied": "Accès au microphone refusé. Veuillez autoriser l'accès dans les paramètres de votre navigateur."
+                "microphoneDenied": "Accès au microphone refusé. Veuillez autoriser l'accès dans les paramètres de votre navigateur.",
+                "generic": "Une erreur est survenue. Veuillez réessayer l'enregistrement."
             }
         },
         "verify": {
@@ -523,12 +512,16 @@
             "retry": "Réessayer",
             "success": "Voix reconnue !",
             "redirecting": "Redirection en cours...",
+            "example": "Mouhamed Ndiaye",
+            "exampleLabel": "Exemple",
+            "enrolledAt": "Inscrit le",
             "errors": {
                 "recordingFailed": "Erreur lors de l'enregistrement",
                 "verificationFailed": "Erreur lors de la vérification. Veuillez réessayer.",
                 "voiceNotRecognized": "Voix non reconnue. Veuillez réessayer.",
                 "userNotFound": "Utilisateur non trouvé. Veuillez vous inscrire d'abord.",
-                "microphoneDenied": "Accès au microphone refusé. Veuillez autoriser l'accès dans les paramètres de votre navigateur."
+                "microphoneDenied": "Accès au microphone refusé. Veuillez autoriser l'accès dans les paramètres de votre navigateur.",
+                "generic": "Une erreur est survenue. Veuillez réessayer."
             }
         }
     }

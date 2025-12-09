@@ -26,18 +26,17 @@ import {
 function TypeDistributionChart({ byType = {}, loading = false, namespace = 'agent' }) {
   const { t } = useTranslation(namespace);
 
-  // Couleurs pour chaque type
+  // Couleurs pour chaque type (types réels de la base de données)
   const COLORS = {
-    road: '#3b82f6', // blue
-    lighting: '#f59e0b', // amber
-    water: '#06b6d4', // cyan
-    waste: '#10b981', // green
-    security: '#ef4444', // red
-    health: '#ec4899', // pink
-    electricity: '#fbbf24', // yellow
-    sanitation: '#8b5cf6', // purple
-    green_spaces: '#22c55e', // green
-    other: '#6b7280', // gray
+    voirie: '#3b82f6', // blue
+    eclairage: '#f59e0b', // amber
+    eau: '#06b6d4', // cyan
+    dechets: '#10b981', // green
+    securite: '#ef4444', // red
+    assainissement: '#8b5cf6', // purple
+    espaces_verts: '#22c55e', // green
+    transport: '#6366f1', // indigo
+    autre: '#6b7280', // gray
   };
 
   // Préparer les données pour le graphique (mémorisé pour éviter les re-renders)
@@ -54,14 +53,14 @@ function TypeDistributionChart({ byType = {}, loading = false, namespace = 'agen
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <PieChartIcon className="w-5 h-5 text-primary-600" />
+      <Card className="bg-gradient-to-br from-violet-50/50 via-white to-purple-50/30 border-2 border-violet-200/50 shadow-md">
+        <CardHeader className="bg-gradient-to-r from-violet-50 to-transparent border-b border-violet-200/30">
+          <CardTitle className="flex items-center gap-2 text-violet-900">
+            <PieChartIcon className="w-5 h-5 text-violet-600" />
             {t(`${namespace === 'admin' ? 'analytics' : 'trends'}.by_type.title`, { defaultValue: 'Répartition par type' })}
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <div className="h-80 bg-neutral-100 rounded-lg animate-pulse" />
         </CardContent>
       </Card>
@@ -70,15 +69,15 @@ function TypeDistributionChart({ byType = {}, loading = false, namespace = 'agen
 
   if (data.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <PieChartIcon className="w-5 h-5 text-primary-600" />
+      <Card className="bg-gradient-to-br from-violet-50/50 via-white to-purple-50/30 border-2 border-violet-200/50 shadow-md">
+        <CardHeader className="bg-gradient-to-r from-violet-50 to-transparent border-b border-violet-200/30">
+          <CardTitle className="flex items-center gap-2 text-violet-900">
+            <PieChartIcon className="w-5 h-5 text-violet-600" />
             {t(`${namespace === 'admin' ? 'analytics' : 'trends'}.by_type.title`, { defaultValue: 'Répartition par type' })}
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-neutral-500 text-center py-12">
+        <CardContent className="pt-6">
+          <p className="text-violet-700 text-center py-12 font-medium">
             {t(`${namespace === 'admin' ? 'analytics' : 'trends'}.no_data`, { defaultValue: 'Aucune donnée disponible' })}
           </p>
         </CardContent>
@@ -102,14 +101,14 @@ function TypeDistributionChart({ byType = {}, loading = false, namespace = 'agen
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <PieChartIcon className="w-5 h-5 text-primary-600" />
+    <Card className="bg-gradient-to-br from-violet-50/50 via-white to-purple-50/30 border-2 border-violet-200/50 shadow-md">
+      <CardHeader className="bg-gradient-to-r from-violet-50 to-transparent border-b border-violet-200/30">
+        <CardTitle className="flex items-center gap-2 text-violet-900">
+          <PieChartIcon className="w-5 h-5 text-violet-600" />
           {t(`${namespace === 'admin' ? 'analytics' : 'trends'}.by_type.title`, { defaultValue: 'Répartition par type' })}
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <ResponsiveContainer width="100%" height={320}>
           <PieChart>
             <Pie

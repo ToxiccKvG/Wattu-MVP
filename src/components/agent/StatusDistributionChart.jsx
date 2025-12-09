@@ -62,14 +62,14 @@ function StatusDistributionChart({ byStatus = {}, loading = false, namespace = '
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-primary-600" />
+      <Card className="bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/30 border-2 border-teal-200/50 shadow-md">
+        <CardHeader className="bg-gradient-to-r from-teal-50 to-transparent border-b border-teal-200/30">
+          <CardTitle className="flex items-center gap-2 text-teal-900">
+            <BarChart3 className="w-5 h-5 text-teal-600" />
             {t(`${namespace === 'admin' ? 'analytics' : 'trends'}.by_status.title`, { defaultValue: 'Répartition par statut' })}
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <div className="h-80 bg-neutral-100 rounded-lg animate-pulse" />
         </CardContent>
       </Card>
@@ -79,15 +79,15 @@ function StatusDistributionChart({ byStatus = {}, loading = false, namespace = '
   const total = data.reduce((sum, item) => sum + item.value, 0);
   if (total === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-primary-600" />
+      <Card className="bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/30 border-2 border-teal-200/50 shadow-md">
+        <CardHeader className="bg-gradient-to-r from-teal-50 to-transparent border-b border-teal-200/30">
+          <CardTitle className="flex items-center gap-2 text-teal-900">
+            <BarChart3 className="w-5 h-5 text-teal-600" />
             {t(`${namespace === 'admin' ? 'analytics' : 'trends'}.by_status.title`, { defaultValue: 'Répartition par statut' })}
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-neutral-500 text-center py-12">
+        <CardContent className="pt-6">
+          <p className="text-teal-700 text-center py-12 font-medium">
             {t(`${namespace === 'admin' ? 'analytics' : 'trends'}.no_data`, { defaultValue: 'Aucune donnée disponible' })}
           </p>
         </CardContent>
@@ -111,14 +111,14 @@ function StatusDistributionChart({ byStatus = {}, loading = false, namespace = '
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <BarChart3 className="w-5 h-5 text-primary-600" />
+    <Card className="bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/30 border-2 border-teal-200/50 shadow-md">
+      <CardHeader className="bg-gradient-to-r from-teal-50 to-transparent border-b border-teal-200/30">
+        <CardTitle className="flex items-center gap-2 text-teal-900">
+          <BarChart3 className="w-5 h-5 text-teal-600" />
           {t(`${namespace === 'admin' ? 'analytics' : 'trends'}.by_status.title`, { defaultValue: 'Répartition par statut' })}
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <ResponsiveContainer width="100%" height={320}>
           <BarChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />

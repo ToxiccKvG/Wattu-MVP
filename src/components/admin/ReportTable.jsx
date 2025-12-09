@@ -134,9 +134,9 @@ function ReportTable({ reports, loading }) {
   return (
     <div className="space-y-4">
       {/* Table Desktop */}
-      <div className="hidden lg:block overflow-x-auto border border-neutral-200 rounded-lg">
+      <div className="hidden lg:block overflow-x-auto border border-blue-200/50 rounded-lg bg-white shadow-sm">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 border-b border-neutral-200">
+          <thead className="bg-blue-50/50 border-b border-blue-200/50">
             <tr>
               {/* ID */}
               <th className="px-4 py-3 text-left">
@@ -212,7 +212,7 @@ function ReportTable({ reports, loading }) {
           </thead>
           <tbody className="divide-y divide-neutral-200">
             {paginatedReports.map(report => (
-              <tr key={report.id} className="hover:bg-neutral-50 transition-colors">
+              <tr key={report.id} className="bg-white hover:bg-blue-50/30 transition-colors">
                 {/* ID */}
                 <td className="px-4 py-3 font-mono text-xs text-neutral-600">
                   {report.id.slice(0, 8)}
@@ -267,7 +267,7 @@ function ReportTable({ reports, loading }) {
         {paginatedReports.map(report => (
           <div
             key={report.id}
-            className="border border-neutral-200 rounded-lg p-4 space-y-3 hover:shadow-md transition-shadow"
+            className="bg-white border border-blue-200/50 rounded-lg p-4 space-y-3 hover:bg-blue-50/30 hover:shadow-md transition-all"
           >
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1">

@@ -57,9 +57,9 @@ function AdminLayout() {
   ];
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex">
+    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-50/50 flex">
       {/* SIDEBAR DESKTOP */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-64 bg-white border-r border-neutral-200">
+      <aside className="hidden lg:flex lg:flex-col lg:w-64 bg-white border-r border-neutral-200 shadow-sm">
         {/* Logo/Titre */}
         <div className="p-6 border-b border-neutral-200">
           <Logo size="md" withLink={false} />
@@ -195,7 +195,7 @@ function AdminLayout() {
       {/* CONTENU PRINCIPAL */}
       <div className="flex-1 flex flex-col min-h-screen">
         {/* Header Mobile */}
-        <header className="lg:hidden bg-white border-b border-neutral-200 p-4 flex items-center justify-between">
+        <header className="lg:hidden bg-white/95 backdrop-blur-sm border-b border-neutral-200 p-4 flex items-center justify-between shadow-sm">
           <button 
             onClick={() => setSidebarOpen(true)}
             className="p-2 hover:bg-neutral-100 rounded-lg"

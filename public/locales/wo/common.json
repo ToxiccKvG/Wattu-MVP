@@ -193,7 +193,8 @@
     "version": "v1.0.0",
     "voiceOption": "Mën nga it defar ci agent IA",
     "voiceOptionDesc": "Agent IA bi dina la laaj ci kàddu, yaw dina ko tontu ci kàddu",
-    "startVoiceSignup": "Tàmbalee defar ci kàddu"
+    "startVoiceSignup": "M'enroller",
+    "voiceLogin": "Señale"
   },
   "dashboard": {
     "logout": "Génn",
@@ -217,26 +218,10 @@
       "subtitle": "Ndimbal sa komiin ngir yàgg sa aaduna",
       "cta": "Def xibaaré"
     },
-    "quick": {
-      "report": {
-        "title": "Xibaaré bu bees",
-        "desc": "Xibaaré problema bu sa dëkk"
-      },
-      "map": {
-        "title": "Gis kàrt bi",
-        "desc": "Xool xibaaréyu sa dëkk"
-      },
-      "dashboard": {
-        "title": "Sama xibaaréyu",
-        "desc": "Xoolal taariix bu sama xibaaréyu"
-      }
-    },
-    "howto": {
-      "title": "Naka laay def?",
-      "step1": "Waxal problema bi",
-      "step2": "Yokk nataal",
-      "step3": "Bennal bëres bi",
-      "step4": "Sa komiin di wara liggeey"
+    "types": {
+      "agression": "Agression",
+      "eclairage": "Eclairage",
+      "dechets": "Njàlbeen"
     }
   },
   "map": {
@@ -507,7 +492,8 @@
     }
   },
   "report": {
-    "type_section_title": "Lan la nga di xibaare ?"
+    "type_section_title": "Lan la nga di xibaare ?",
+    "type_selected": "Xeetu tànn na"
   },
   "report_types": {
     "voirie": "Yoon / dalal yoon",
@@ -542,7 +528,8 @@
     "enroll": {
       "title": "Defar ci kàddu",
       "instruction": "Wax sa tur ak sa tur bu jëkk",
-      "example": "Mëneel: \"Sama tur Ousmane Dafara\"",
+      "example": "Mouhamed Ndiaye",
+      "exampleLabel": "Mëneel",
       "recording": "Dafay jàllè...",
       "processing": "Dafay xool sa baat...",
       "confirm": "Dëgëlante sa tur",
@@ -554,12 +541,14 @@
       "retry": "Waxaat",
       "saving": "Dafay defar compte bi...",
       "success": "Defar na!",
+      "accountCreated": "Sa compte bi defar na!",
       "errors": {
         "recordingFailed": "Njumte ci jàllè",
         "transcriptionFailed": "Manuma ko dégg. Bind ci loxo sa tur.",
         "nameExtractionFailed": "Manuma ko gis sa tur. Bind ci loxo.",
         "enrollmentFailed": "Njumte ci defar. Waxaat.",
-        "microphoneDenied": "Manuma gis mikrofon. Jox ko ci teraangay."
+        "microphoneDenied": "Manuma gis mikrofon. Jox ko ci teraangay.",
+        "generic": "Am na njumte. Waxaat jàllè bi."
       }
     },
     "verify": {
@@ -571,12 +560,16 @@
       "retry": "Waxaat",
       "success": "Baat bi gis na!",
       "redirecting": "Dafay dellu...",
+      "example": "Mouhamed Ndiaye",
+      "exampleLabel": "Mëneel",
+      "enrolledAt": "Defar ci",
       "errors": {
         "recordingFailed": "Njumte ci jàllè",
         "verificationFailed": "Njumte ci xool. Waxaat.",
         "voiceNotRecognized": "Baat bi gisuma. Waxaat.",
         "userNotFound": "Gisuma ko. Defar dëmb.",
-        "microphoneDenied": "Manuma gis mikrofon. Jox ko ci teraangay."
+        "microphoneDenied": "Manuma gis mikrofon. Jox ko ci teraangay.",
+        "generic": "Am na njumte. Waxaat."
       }
     }
   }

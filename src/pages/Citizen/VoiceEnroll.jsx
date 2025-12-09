@@ -7,20 +7,17 @@
  * Processus :
  * 1. L'utilisateur enregistre sa voix (dit son nom et prénom)
  * 2. L'audio est envoyé au backend pour transcription
- * 3. Le nom transcrit est affiché pour confirmation/correction
- * 4. Après confirmation, l'utilisateur est créé et redirigé vers vérification
+ * 3. Le compte est créé directement et l'utilisateur est redirigé vers vérification
  */
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Mic, MicOff, Loader2, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
+import { Mic, MicOff, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import Logo from '@/components/shared/Logo';
 import { useAudioRecording } from '@/hooks/useAudioRecording';
 import { voiceAuthApi } from '@/api/voiceAuthApi';
@@ -30,15 +27,8 @@ function VoiceEnroll() {
   const navigate = useNavigate();
 
   // États du processus
-  const [step, setStep] = useState('record'); // 'record' | 'processing' | 'confirm' | 'saving'
+  const [step, setStep] = useState('record'); // 'record' | 'processing' | 'saving'
   const [error, setError] = useState(null);
-
-  // Données d'enrôlement (reçues du backend)
-  const [enrollmentData, setEnrollmentData] = useState(null);
-
-  // Formulaire de correction du nom
-  const [editedName, setEditedName] = useState('');
-  const [editedPrenom, setEditedPrenom] = useState('');
 
   // Hook d'enregistrement audio
   const {
@@ -48,10 +38,11 @@ function VoiceEnroll() {
     maxDuration,
     audioBlob,
     error: recordingError,
+    volume, // Volume en temps réel (0-1)
     startRecording,
     stopRecording,
     resetRecording,
-  } = useAudioRecording({ maxDuration: 10 }); // 10 secondes max pour dire son nom
+  } = useAudioRecording({ maxDuration: 5 }); // 5 secondes max pour dire son nom
 
   // Vérifier si l'API vocale est disponible
   useEffect(() => {
@@ -73,7 +64,7 @@ function VoiceEnroll() {
   }, [audioBlob, step, isRecording]);
 
   /**
-   * Envoie l'audio au backend pour traitement
+   * Envoie l'audio au backend pour traitement et création du compte
    */
   const handleProcessAudio = async () => {
     if (!audioBlob) return;
@@ -82,90 +73,64 @@ function VoiceEnroll() {
     setError(null);
 
     try {
-      const result = await voiceAuthApi.enrollVoice(audioBlob);
+      // Étape 1 : Transcription et extraction d'embedding
+      const enrollResult = await voiceAuthApi.enrollVoice(audioBlob);
 
-      if (result.success) {
-        setEnrollmentData(result);
-        setEditedPrenom(result.prenom || '');
-        setEditedName(result.name || '');
-        setStep('confirm');
-        
-        // Si transcription réussie, afficher succès, sinon juste passer à la confirmation
-        if (result.transcribed_text && result.transcribed_text.trim()) {
-          toast.success(t('voiceAuth.enroll.success', { defaultValue: 'Voix analysée avec succès !' }));
-        } else {
-          toast.info(t('voiceAuth.enroll.errors.transcriptionFailed', { defaultValue: 'Veuillez saisir votre nom et prénom manuellement.' }));
-        }
-      } else {
-        setError(result.error || result.message || t('voiceAuth.enroll.errors.enrollmentFailed', { defaultValue: 'Erreur lors de l\'analyse de la voix' }));
+      if (!enrollResult.success) {
+        // Erreur lors de l'enrôlement - retour à l'enregistrement
+        setError(t('voiceAuth.enroll.errors.generic', { defaultValue: 'Une erreur est survenue. Veuillez réessayer l\'enregistrement.' }));
         setStep('record');
         resetRecording();
+        return;
       }
-    } catch (err) {
-      console.error('Erreur traitement audio:', err);
-      const errorMessage = err.message || t('voiceAuth.enroll.errors.enrollmentFailed', { defaultValue: 'Une erreur est survenue. Veuillez réessayer.' });
-      setError(errorMessage);
+
+      // Vérifier que le prénom a été extrait (obligatoire)
+      if (!enrollResult.prenom || !enrollResult.prenom.trim()) {
+        // Transcription échouée - retour à l'enregistrement
+        setError(t('voiceAuth.enroll.errors.generic', { defaultValue: 'Une erreur est survenue. Veuillez réessayer l\'enregistrement.' }));
       setStep('record');
       resetRecording();
-    }
-  };
-
-  /**
-   * Confirme l'enrôlement avec le nom corrigé
-   */
-  const handleConfirmEnrollment = async () => {
-    if (!enrollmentData || !editedPrenom.trim()) {
-      setError(t('voiceAuth.enroll.errors.nameExtractionFailed', { defaultValue: 'Veuillez saisir au moins votre prénom' }));
       return;
     }
 
+      // Étape 2 : Création directe du compte
     setStep('saving');
-    setError(null);
 
-    try {
-      const result = await voiceAuthApi.confirmEnrollment({
-        temp_user_id: enrollmentData.temp_user_id,
-        name: editedName.trim(),
-        prenom: editedPrenom.trim(),
-        voice_embedding: enrollmentData.voice_embedding,
+      const confirmResult = await voiceAuthApi.confirmEnrollment({
+        temp_user_id: enrollResult.temp_user_id,
+        name: (enrollResult.name || '').trim(),
+        prenom: enrollResult.prenom.trim(),
+        voice_embedding: enrollResult.voice_embedding,
       });
 
-      if (result.success) {
+      if (confirmResult.success) {
         // Stocker l'utilisateur vocal dans localStorage
         const voiceUser = {
-          id: result.user_id,
-          name: result.name,
-          prenom: result.prenom,
+          id: confirmResult.user_id,
+          name: confirmResult.name,
+          prenom: confirmResult.prenom,
           authenticated: false, // Pas encore vérifié
           enrolledAt: new Date().toISOString(),
         };
         localStorage.setItem('voiceUser', JSON.stringify(voiceUser));
 
-        toast.success(`Bienvenue ${result.prenom} ! Veuillez confirmer votre voix.`);
+        toast.success(t('voiceAuth.enroll.accountCreated', { defaultValue: 'Votre compte a été bien créé' }));
         
-        // Rediriger vers la page de vérification
-        navigate('/voice-verify', { replace: true });
+        // Rediriger vers la page welcome pour qu'il se connecte
+        navigate('/welcome', { replace: true });
       } else {
-        setError(result.error || 'Erreur lors de la création du compte');
-        setStep('confirm');
+        // Erreur lors de la création du compte - retour à l'enregistrement
+        setError(t('voiceAuth.enroll.errors.generic', { defaultValue: 'Une erreur est survenue. Veuillez réessayer l\'enregistrement.' }));
+        setStep('record');
+        resetRecording();
       }
     } catch (err) {
-      console.error('Erreur confirmation:', err);
-      setError('Une erreur est survenue. Veuillez réessayer.');
-      setStep('confirm');
+      console.error('Erreur traitement audio:', err);
+      // Erreur générique - retour à l'enregistrement
+      setError(t('voiceAuth.enroll.errors.generic', { defaultValue: 'Une erreur est survenue. Veuillez réessayer l\'enregistrement.' }));
+      setStep('record');
+      resetRecording();
     }
-  };
-
-  /**
-   * Recommencer l'enregistrement
-   */
-  const handleRetry = () => {
-    setStep('record');
-    setEnrollmentData(null);
-    setEditedName('');
-    setEditedPrenom('');
-    setError(null);
-    resetRecording();
   };
 
   /**
@@ -180,14 +145,14 @@ function VoiceEnroll() {
   // Afficher erreur de support navigateur
   if (!isSupported) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-neutral-50 px-4">
+      <div className="min-h-screen flex items-center justify-center bg-black px-4">
         <Card className="w-full max-w-md">
           <CardContent className="pt-6 text-center">
             <AlertCircle className="h-12 w-12 text-error-500 mx-auto mb-4" />
-            <h2 className="text-lg font-semibold text-neutral-900 mb-2">
+            <h2 className="text-lg font-semibold text-black mb-2">
               Navigateur non supporté
             </h2>
-            <p className="text-sm text-neutral-600">
+            <p className="text-sm text-black">
               Votre navigateur ne supporte pas l'enregistrement audio. 
               Veuillez utiliser Chrome, Firefox ou Safari.
             </p>
@@ -198,58 +163,68 @@ function VoiceEnroll() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-primary-50 via-white to-neutral-50 px-4 py-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-black px-4 py-8">
       {/* Logo */}
       <div className="mb-6 text-center">
         <div className="flex justify-center mb-4">
           <Logo size="lg" withLink={false} />
         </div>
-        <h1 className="text-xl font-bold text-neutral-900">
+        <h1 className="text-xl font-bold text-white">
           {t('voiceAuth.enroll.title', { defaultValue: 'Inscription vocale' })}
         </h1>
       </div>
 
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-lg text-center">
+      <Card className="w-full max-w-md shadow-xl border-0">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-xl text-center font-bold text-black">
             {step === 'record' && t('voiceAuth.enroll.instruction', { defaultValue: 'Enregistrez votre voix' })}
             {step === 'processing' && t('voiceAuth.enroll.processing', { defaultValue: 'Analyse en cours...' })}
-            {step === 'confirm' && t('voiceAuth.enroll.confirm', { defaultValue: 'Confirmez votre nom' })}
             {step === 'saving' && t('voiceAuth.enroll.saving', { defaultValue: 'Création du compte...' })}
           </CardTitle>
-          <CardDescription className="text-center">
-            {step === 'record' && t('voiceAuth.enroll.instruction', { defaultValue: 'Dites clairement votre prénom et nom' })}
+          {(step === 'processing' || step === 'saving') && (
+          <CardDescription className="text-center text-gray-600">
             {step === 'processing' && t('voiceAuth.enroll.processing', { defaultValue: 'Veuillez patienter' })}
-            {step === 'confirm' && t('voiceAuth.enroll.confirm', { defaultValue: 'Vérifiez et corrigez si nécessaire' })}
             {step === 'saving' && t('voiceAuth.enroll.saving', { defaultValue: 'Veuillez patienter' })}
           </CardDescription>
+          )}
         </CardHeader>
 
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-2">
           {/* Erreur globale */}
           {(error || recordingError) && (
             <div className="p-3 rounded-lg bg-error-50 border border-error-200 flex items-start gap-2">
               <AlertCircle className="h-5 w-5 text-error-500 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-error-700">
-                {error || recordingError?.message || t('voiceAuth.enroll.errors.recordingFailed', { defaultValue: 'Erreur lors de l\'enregistrement' })}
+                {error || t('voiceAuth.enroll.errors.generic', { defaultValue: 'Une erreur est survenue. Veuillez réessayer l\'enregistrement.' })}
               </p>
             </div>
           )}
 
           {/* Étape 1 : Enregistrement */}
           {step === 'record' && (
-            <div className="flex flex-col items-center space-y-6">
+            <div className="flex flex-col items-center space-y-8">
               {/* Indicateur de durée */}
               <div className="text-center">
-                <p className="text-3xl font-mono font-bold text-neutral-900">
+                <p className={`text-4xl font-mono font-bold transition-colors duration-300 ${
+                  isRecording ? 'text-error-600' : 'text-black'
+                }`}>
                   {formatDuration(duration)}
                 </p>
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs text-gray-600 mt-1">
                   max {formatDuration(maxDuration)}
                 </p>
               </div>
 
-              {/* Bouton d'enregistrement */}
+              {/* Bouton d'enregistrement avec animation de vagues */}
+              <div className="relative flex items-center justify-center">
+                {/* Cercle animé autour du bouton quand on enregistre */}
+                {isRecording && (
+                  <>
+                    <div className="absolute w-32 h-32 rounded-full bg-red-500/20 animate-ping" />
+                    <div className="absolute w-28 h-28 rounded-full bg-red-500/30 animate-pulse" />
+                  </>
+                )}
+                
               <button
                 onClick={async () => {
                   if (isRecording) {
@@ -263,36 +238,78 @@ function VoiceEnroll() {
                 }}
                 disabled={recordingError && !isRecording}
                 className={`
-                  w-24 h-24 rounded-full flex items-center justify-center
-                  transition-all duration-300 shadow-lg
+                    relative w-28 h-28 rounded-full flex items-center justify-center overflow-hidden
+                    transition-all duration-300 shadow-xl z-10
                   ${isRecording 
-                    ? 'bg-error-500 hover:bg-error-600 animate-pulse' 
-                    : 'bg-primary-600 hover:bg-primary-700'
+                      ? 'bg-red-500 hover:bg-red-600 scale-110 ring-4 ring-red-500/50' 
+                      : 'bg-blue-600 hover:bg-blue-700 hover:scale-105'
                   }
                   ${recordingError && !isRecording ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                    transform
                 `}
               >
+                  {/* Animation de vagues basée sur le volume */}
+                  {isRecording && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      {[...Array(3)].map((_, i) => {
+                        const baseSize = 28;
+                        const waveSize = baseSize + (volume * 50) * (1 + i * 0.4);
+                        const baseOpacity = 0.4 - (i * 0.15);
+                        const dynamicOpacity = baseOpacity + (volume * 0.3);
+                        return (
+                          <div
+                            key={i}
+                            className="absolute rounded-full border-2 border-white"
+                            style={{
+                              width: `${waveSize}px`,
+                              height: `${waveSize}px`,
+                              opacity: Math.max(0.1, Math.min(0.7, dynamicOpacity)),
+                              transform: `translate(-50%, -50%) scale(${1 + volume * 0.4})`,
+                              left: '50%',
+                              top: '50%',
+                              transition: 'all 0.05s ease-out',
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                  )}
+                  
+                  {/* Icône microphone */}
+                  <div className="relative z-10">
                 {isRecording ? (
-                  <MicOff className="h-10 w-10 text-white" />
+                      <MicOff className="h-12 w-12 text-white" style={{ 
+                        transform: `scale(${1 + volume * 0.1})`,
+                        transition: 'transform 0.1s ease-out'
+                      }} />
                 ) : (
-                  <Mic className="h-10 w-10 text-white" />
+                      <Mic className="h-12 w-12 text-white" />
                 )}
+                  </div>
               </button>
+              </div>
 
-              <p className="text-sm text-neutral-600 text-center">
-                {isRecording 
-                  ? t('voiceAuth.enroll.instruction', { defaultValue: 'Dites votre prénom et nom, puis appuyez pour arrêter' })
-                  : t('voiceAuth.enroll.instruction', { defaultValue: 'Appuyez pour commencer l\'enregistrement' })
-                }
+              {/* Indicateur visuel d'enregistrement */}
+              {isRecording && (
+                <div className="flex items-center gap-2 text-red-600">
+                  <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                  <p className="text-sm font-medium text-black">
+                    {t('voiceAuth.enroll.recording', { defaultValue: 'Enregistrement en cours...' })}
               </p>
+                </div>
+              )}
 
-              {/* Instructions */}
-              <div className="bg-neutral-50 p-4 rounded-lg w-full">
-                <p className="text-sm text-neutral-700 font-medium mb-2">
-                  💡 {t('voiceAuth.enroll.example', { defaultValue: 'Exemple' })} :
+              {/* Exemple */}
+              <div className="bg-gradient-to-br from-blue-50 to-primary-50 p-5 rounded-xl w-full border-2 border-blue-200/50 shadow-sm">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                  <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide">
+                    {t('voiceAuth.enroll.exampleLabel', { defaultValue: 'Exemple' })}
                 </p>
-                <p className="text-sm text-neutral-600 italic">
-                  "{t('voiceAuth.enroll.example', { defaultValue: 'Je m\'appelle Ousmane Diouf' })}"
+                  <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                </div>
+                <p className="text-base font-medium text-black text-center">
+                  "{t('voiceAuth.enroll.example', { defaultValue: 'Mouhamed Ndiaye' })}"
                 </p>
               </div>
             </div>
@@ -300,88 +317,25 @@ function VoiceEnroll() {
 
           {/* Étape 2 : Traitement */}
           {step === 'processing' && (
-            <div className="flex flex-col items-center space-y-4 py-8">
-              <Loader2 className="h-12 w-12 text-primary-600 animate-spin" />
-              <p className="text-sm text-neutral-600">
+            <div className="flex flex-col items-center space-y-4 py-12">
+              <div className="relative">
+                <Loader2 className="h-16 w-16 text-primary-600 animate-spin" />
+                <div className="absolute inset-0 rounded-full border-4 border-primary-100" />
+              </div>
+              <p className="text-base text-black font-medium">
                 {t('voiceAuth.enroll.processing', { defaultValue: 'Analyse de votre voix...' })}
               </p>
             </div>
           )}
 
-          {/* Étape 3 : Confirmation du nom */}
-          {step === 'confirm' && enrollmentData && (
-            <div className="space-y-4">
-              {/* Texte transcrit (si disponible) */}
-              {enrollmentData.transcribed_text && enrollmentData.transcribed_text.trim() && (
-                <div className="bg-neutral-50 p-3 rounded-lg">
-                  <p className="text-xs text-neutral-500 mb-1">{t('voiceAuth.enroll.transcription', { defaultValue: 'Transcription' })} :</p>
-                  <p className="text-sm text-neutral-700 italic">
-                    "{enrollmentData.transcribed_text}"
-                  </p>
-                </div>
-              )}
-              
-              {/* Message si pas de transcription */}
-              {(!enrollmentData.transcribed_text || !enrollmentData.transcribed_text.trim()) && (
-                <div className="bg-primary-50 p-3 rounded-lg border border-primary-200">
-                  <p className="text-sm text-primary-700">
-                    {t('voiceAuth.enroll.errors.transcriptionFailed', { defaultValue: 'La transcription automatique n\'a pas fonctionné. Veuillez saisir votre nom et prénom manuellement.' })}
-                  </p>
-                </div>
-              )}
-
-              {/* Formulaire de correction */}
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="prenom">{t('voiceAuth.enroll.prenom', { defaultValue: 'Prénom' })} *</Label>
-                  <Input
-                    id="prenom"
-                    value={editedPrenom}
-                    onChange={(e) => setEditedPrenom(e.target.value)}
-                    placeholder={t('voiceAuth.enroll.prenomPlaceholder', { defaultValue: 'Votre prénom' })}
-                    className="mt-1"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="name">{t('voiceAuth.enroll.name', { defaultValue: 'Nom' })}</Label>
-                  <Input
-                    id="name"
-                    value={editedName}
-                    onChange={(e) => setEditedName(e.target.value)}
-                    placeholder={t('voiceAuth.enroll.namePlaceholder', { defaultValue: 'Votre nom de famille' })}
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-
-              {/* Boutons */}
-              <div className="flex gap-3 pt-2">
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={handleRetry}
-                >
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  {t('voiceAuth.enroll.retry', { defaultValue: 'Recommencer' })}
-                </Button>
-                <Button
-                  className="flex-1"
-                  onClick={handleConfirmEnrollment}
-                  disabled={!editedPrenom.trim()}
-                >
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  {t('voiceAuth.enroll.confirmButton', { defaultValue: 'Confirmer' })}
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Étape 4 : Sauvegarde */}
+          {/* Étape 3 : Sauvegarde */}
           {step === 'saving' && (
-            <div className="flex flex-col items-center space-y-4 py-8">
-              <Loader2 className="h-12 w-12 text-primary-600 animate-spin" />
-              <p className="text-sm text-neutral-600">
+            <div className="flex flex-col items-center space-y-4 py-12">
+              <div className="relative">
+                <Loader2 className="h-16 w-16 text-primary-600 animate-spin" />
+                <div className="absolute inset-0 rounded-full border-4 border-primary-100" />
+              </div>
+              <p className="text-base text-black font-medium">
                 Création de votre compte...
               </p>
             </div>

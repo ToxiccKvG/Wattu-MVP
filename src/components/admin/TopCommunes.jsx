@@ -18,10 +18,10 @@ function TopCommunes({ topCommunes, loading }) {
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Award className="w-5 h-5 text-primary-600" />
+      <Card className="bg-gradient-to-br from-amber-50/50 via-white to-yellow-50/30 border-2 border-amber-200/50 shadow-md">
+        <CardHeader className="bg-gradient-to-r from-amber-50 to-transparent border-b border-amber-200/30">
+          <CardTitle className="flex items-center gap-2 text-amber-900">
+            <Award className="w-5 h-5 text-amber-600" />
             {t('top_communes.title', { defaultValue: 'Top 5 Communes' })}
           </CardTitle>
         </CardHeader>
@@ -38,10 +38,10 @@ function TopCommunes({ topCommunes, loading }) {
 
   if (!topCommunes || topCommunes.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Award className="w-5 h-5 text-primary-600" />
+      <Card className="bg-gradient-to-br from-amber-50/50 via-white to-yellow-50/30 border-2 border-amber-200/50 shadow-md">
+        <CardHeader className="bg-gradient-to-r from-amber-50 to-transparent border-b border-amber-200/30">
+          <CardTitle className="flex items-center gap-2 text-amber-900">
+            <Award className="w-5 h-5 text-amber-600" />
             {t('top_communes.title', { defaultValue: 'Top 5 Communes' })}
           </CardTitle>
         </CardHeader>
@@ -69,17 +69,17 @@ function TopCommunes({ topCommunes, loading }) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Award className="w-5 h-5 text-primary-600" />
+    <Card className="bg-gradient-to-br from-amber-50/50 via-white to-yellow-50/30 border-2 border-amber-200/50 shadow-md">
+      <CardHeader className="bg-gradient-to-r from-amber-50 to-transparent border-b border-amber-200/30">
+        <CardTitle className="flex items-center gap-2 text-amber-900">
+          <Award className="w-5 h-5 text-amber-600" />
           {t('top_communes.title', { defaultValue: 'Top 5 Communes' })}
         </CardTitle>
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-amber-700 font-medium">
           {t('top_communes.subtitle', { defaultValue: 'Classées par volume de signalements' })}
         </p>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <div className="space-y-3">
           {topCommunes.map((commune, index) => {
             const rank = index + 1;

@@ -278,48 +278,80 @@ function ReportDetail() {
         <div className="lg:col-span-2 space-y-6">
           {/* Audio ou Description */}
           {report.audio_url ? (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Mic className="w-5 h-5" />
+            <Card className="bg-gradient-to-br from-blue-50/50 via-white to-cyan-50/30 border-2 border-blue-200/50 shadow-md">
+              <CardHeader className="bg-gradient-to-r from-blue-50 to-transparent border-b border-blue-200/30">
+                <CardTitle className="text-lg flex items-center gap-2 text-blue-900">
+                  <Mic className="w-5 h-5 text-blue-600" />
                   Enregistrement audio
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6">
                 <AudioPlayer audioUrl={report.audio_url} />
-                <p className="text-xs text-neutral-500 mt-3">
+                <p className="text-xs text-blue-700 mt-3 font-medium bg-blue-50/50 px-3 py-2 rounded-lg border border-blue-200/50">
                   Écoutez l'enregistrement pour comprendre le problème signalé
                 </p>
               </CardContent>
             </Card>
           ) : report.description ? (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Description</CardTitle>
+            <Card className="bg-gradient-to-br from-amber-50/50 via-white to-orange-50/30 border-2 border-amber-200/50 shadow-md">
+              <CardHeader className="bg-gradient-to-r from-amber-50 to-transparent border-b border-amber-200/30">
+                <CardTitle className="text-lg text-amber-900">Description</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6">
                 <p className="text-neutral-700">{report.description}</p>
               </CardContent>
             </Card>
           ) : null}
 
-          {/* Photo du signalement */}
+          {/* Carte - Localisation (en haut maintenant) */}
+          <Card className="bg-gradient-to-br from-green-50/50 via-white to-emerald-50/30 border-2 border-green-200/50 shadow-md">
+            <CardHeader className="bg-gradient-to-r from-green-50 to-transparent border-b border-green-200/30">
+              <CardTitle className="text-lg flex items-center gap-2 text-green-900">
+                <MapPin className="w-5 h-5 text-green-600" />
+                Localisation
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="h-64 rounded-lg overflow-hidden border-2 border-green-200/50 shadow-sm">
+                <MapContainer
+                  center={[report.latitude, report.longitude]}
+                  zoom={15}
+                  style={{ height: '100%', width: '100%' }}
+                >
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                  />
+                  <Marker position={[report.latitude, report.longitude]}>
+                    <Popup>
+                      {report.type?.replace('_', ' ')}
+                    </Popup>
+                  </Marker>
+                </MapContainer>
+              </div>
+              <p className="text-xs text-green-700 mt-3 font-medium bg-green-50/50 px-3 py-2 rounded-lg border border-green-200/50">
+                Coordonnées : {report.latitude.toFixed(6)}, {report.longitude.toFixed(6)}
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Photo du signalement (en bas maintenant) */}
           {report.image_url && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <ImageIcon className="w-5 h-5" />
+            <Card className="bg-gradient-to-br from-purple-50/50 via-white to-pink-50/30 border-2 border-purple-200/50 shadow-md">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-transparent border-b border-purple-200/30">
+                <CardTitle className="text-lg flex items-center gap-2 text-purple-900">
+                  <ImageIcon className="w-5 h-5 text-purple-600" />
                   Photo du signalement
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6">
                 <Dialog>
                   <DialogTrigger asChild>
                     <button className="w-full group">
                       <img
                         src={report.image_url}
                         alt="Photo du signalement"
-                        className="w-full h-auto max-h-[500px] object-contain rounded-lg border border-neutral-200 group-hover:opacity-90 transition-opacity cursor-pointer bg-neutral-50"
+                        className="w-full h-auto max-h-[500px] object-contain rounded-lg border-2 border-purple-200/50 group-hover:opacity-90 transition-opacity cursor-pointer bg-purple-50/30 shadow-sm"
                         onError={(e) => {
                           console.error('❌ Erreur chargement photo:', report.image_url);
                           e.target.style.display = 'none';
@@ -338,44 +370,12 @@ function ReportDetail() {
                     />
                   </DialogContent>
                 </Dialog>
-                <p className="text-xs text-neutral-500 mt-2 text-center">
+                <p className="text-xs text-purple-700 mt-3 text-center font-medium bg-purple-50/50 px-3 py-2 rounded-lg border border-purple-200/50">
                   Cliquez sur la photo pour l'agrandir
                 </p>
               </CardContent>
             </Card>
           )}
-
-          {/* Carte */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <MapPin className="w-5 h-5" />
-                Localisation
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64 rounded-lg overflow-hidden border border-neutral-200">
-                <MapContainer
-                  center={[report.latitude, report.longitude]}
-                  zoom={15}
-                  style={{ height: '100%', width: '100%' }}
-                >
-                  <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                  />
-                  <Marker position={[report.latitude, report.longitude]}>
-                    <Popup>
-                      {report.type?.replace('_', ' ')}
-                    </Popup>
-                  </Marker>
-                </MapContainer>
-              </div>
-              <p className="text-xs text-neutral-600 mt-2">
-                Coordonnées : {report.latitude.toFixed(6)}, {report.longitude.toFixed(6)}
-              </p>
-            </CardContent>
-          </Card>
         </div>
 
         {/* COLONNE DROITE : Informations & Actions */}

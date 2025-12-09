@@ -33,7 +33,7 @@ function Logo({
     sm: 'h-6',
     md: 'h-10',
     lg: 'h-12',
-    xl: 'h-16'
+    xl: 'h-40 md:h-[18rem]' // Responsive: h-40 sur mobile, h-72 sur desktop
   };
 
   const currentSize = sizes[size] || sizes.md;
@@ -43,7 +43,7 @@ function Logo({
     <div className={`flex items-center gap-3 ${className}`}>
       {/* Logo personnalisé */}
       <img 
-        src="/logo wattumvp.jpg" 
+        src="/logo_wattumvp.png" 
         alt="WattU Logo" 
         className={`${currentSize} w-auto object-contain`}
       />

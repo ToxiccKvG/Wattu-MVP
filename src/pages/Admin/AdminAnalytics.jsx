@@ -51,7 +51,7 @@ function AdminAnalytics() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-gradient-to-br from-neutral-50 via-white to-neutral-50/50 -m-6 lg:-m-8 p-6 lg:p-8 rounded-2xl">
       {/* ═══════════════════════════════════════════════════════════
           HEADER
           ═══════════════════════════════════════════════════════════ */}

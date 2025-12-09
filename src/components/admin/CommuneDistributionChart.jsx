@@ -53,14 +53,17 @@ function CommuneDistributionChart({ byCommune = [], loading = false }) {
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-primary-600" />
+      <Card className="bg-gradient-to-br from-sky-50/50 via-white to-blue-50/30 border-2 border-sky-200/50 shadow-md">
+        <CardHeader className="bg-gradient-to-r from-sky-50 to-transparent border-b border-sky-200/30">
+          <CardTitle className="flex items-center gap-2 text-sky-900">
+            <BarChart3 className="w-5 h-5 text-sky-600" />
             {t('analytics.by_commune.title', { defaultValue: 'Répartition par commune' })}
           </CardTitle>
+          <p className="text-sm text-sky-700 font-medium mt-1">
+            {t('analytics.by_commune.subtitle', { defaultValue: 'Top 10 communes' })}
+          </p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <div className="h-80 bg-neutral-100 rounded-lg animate-pulse" />
         </CardContent>
       </Card>
@@ -69,15 +72,18 @@ function CommuneDistributionChart({ byCommune = [], loading = false }) {
 
   if (data.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-primary-600" />
+      <Card className="bg-gradient-to-br from-sky-50/50 via-white to-blue-50/30 border-2 border-sky-200/50 shadow-md">
+        <CardHeader className="bg-gradient-to-r from-sky-50 to-transparent border-b border-sky-200/30">
+          <CardTitle className="flex items-center gap-2 text-sky-900">
+            <BarChart3 className="w-5 h-5 text-sky-600" />
             {t('analytics.by_commune.title', { defaultValue: 'Répartition par commune' })}
           </CardTitle>
+          <p className="text-sm text-sky-700 font-medium mt-1">
+            {t('analytics.by_commune.subtitle', { defaultValue: 'Top 10 communes' })}
+          </p>
         </CardHeader>
-        <CardContent>
-          <p className="text-neutral-500 text-center py-12">
+        <CardContent className="pt-6">
+          <p className="text-sky-700 text-center py-12 font-medium">
             {t('analytics.no_data', { defaultValue: 'Aucune donnée disponible' })}
           </p>
         </CardContent>
@@ -101,17 +107,17 @@ function CommuneDistributionChart({ byCommune = [], loading = false }) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <BarChart3 className="w-5 h-5 text-primary-600" />
+    <Card className="bg-gradient-to-br from-sky-50/50 via-white to-blue-50/30 border-2 border-sky-200/50 shadow-md">
+      <CardHeader className="bg-gradient-to-r from-sky-50 to-transparent border-b border-sky-200/30">
+        <CardTitle className="flex items-center gap-2 text-sky-900">
+          <BarChart3 className="w-5 h-5 text-sky-600" />
           {t('analytics.by_commune.title', { defaultValue: 'Répartition par commune' })}
         </CardTitle>
-        <p className="text-sm text-neutral-500 mt-1">
+        <p className="text-sm text-sky-700 font-medium mt-1">
           {t('analytics.by_commune.subtitle', { defaultValue: 'Top 10 communes' })}
         </p>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <ResponsiveContainer width="100%" height={320}>
           <BarChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 60 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />

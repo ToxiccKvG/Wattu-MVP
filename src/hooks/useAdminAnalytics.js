@@ -166,17 +166,17 @@ function calculateTrends(reports, days = 30) {
  * Calculer la répartition par type
  */
 function calculateByType(reports) {
+  // Types réels utilisés dans la base de données
   const types = [
-    'road',
-    'lighting',
-    'water',
-    'waste',
-    'security',
-    'health',
-    'electricity',
-    'sanitation',
-    'green_spaces',
-    'other'
+    'voirie',
+    'eclairage',
+    'eau',
+    'dechets',
+    'securite',
+    'assainissement',
+    'espaces_verts',
+    'transport',
+    'autre'
   ];
 
   const distribution = {};

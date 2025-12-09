@@ -126,10 +126,10 @@ function Settings() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-neutral-900 mb-2">
+        <h1 className="text-3xl font-bold text-white mb-2">
           {t('settings.title', { defaultValue: 'Paramètres' })}
         </h1>
-        <p className="text-neutral-600">
+        <p className="text-white">
           {t('settings.subtitle', { defaultValue: 'Personnalisez votre expérience' })}
         </p>
       </div>

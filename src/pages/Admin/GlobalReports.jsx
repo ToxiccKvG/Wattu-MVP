@@ -49,7 +49,7 @@ function GlobalReports() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 -m-6 lg:-m-8 p-6 lg:p-8 bg-gradient-to-br from-blue-50/80 via-white to-indigo-50/60 rounded-2xl border-2 border-blue-200/70 shadow-md relative z-10">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

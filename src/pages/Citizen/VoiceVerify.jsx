@@ -41,10 +41,11 @@ function VoiceVerify() {
     maxDuration,
     audioBlob,
     error: recordingError,
+    volume, // Volume en temps réel (0-1)
     startRecording,
     stopRecording,
     resetRecording,
-  } = useAudioRecording({ maxDuration: 10 });
+  } = useAudioRecording({ maxDuration: 5 });
 
   // Charger l'utilisateur vocal depuis localStorage
   useEffect(() => {
@@ -102,18 +103,17 @@ function VoiceVerify() {
         // Voix non reconnue
         setVerificationResult(result);
         setStep('failed');
-        setError(t('voiceAuth.verify.errors.voiceNotRecognized', { defaultValue: 'Voix non reconnue. Veuillez réessayer.' }));
+        setError(t('voiceAuth.verify.errors.generic', { defaultValue: 'Une erreur est survenue. Veuillez réessayer.' }));
         resetRecording();
       } else {
         // Erreur
-        setError(result.error || result.message || t('voiceAuth.verify.errors.verificationFailed', { defaultValue: 'Erreur lors de la vérification. Veuillez réessayer.' }));
+        setError(t('voiceAuth.verify.errors.generic', { defaultValue: 'Une erreur est survenue. Veuillez réessayer.' }));
         setStep('record');
         resetRecording();
       }
     } catch (err) {
       console.error('Erreur vérification:', err);
-      const errorMessage = err.message || t('voiceAuth.verify.errors.verificationFailed', { defaultValue: 'Une erreur est survenue. Veuillez réessayer.' });
-      setError(errorMessage);
+      setError(t('voiceAuth.verify.errors.generic', { defaultValue: 'Une erreur est survenue. Veuillez réessayer.' }));
       setStep('record');
       resetRecording();
     }
@@ -141,7 +141,7 @@ function VoiceVerify() {
   // Afficher erreur de support navigateur
   if (!isSupported) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-neutral-50 px-4">
+      <div className="min-h-screen flex items-center justify-center bg-black px-4">
         <Card className="w-full max-w-md">
           <CardContent className="pt-6 text-center">
             <AlertCircle className="h-12 w-12 text-error-500 mx-auto mb-4" />
@@ -158,7 +158,7 @@ function VoiceVerify() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-primary-50 via-white to-neutral-50 px-4 py-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-black px-4 py-8">
       {/* Logo */}
       <div className="mb-6 text-center">
         <div className="flex justify-center mb-4">
@@ -169,34 +169,35 @@ function VoiceVerify() {
         </h1>
       </div>
 
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-lg text-center">
-            {step === 'record' && t('voiceAuth.verify.title', { defaultValue: 'Confirmez votre identité' })}
+      <Card className="w-full max-w-md shadow-xl border-0">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-xl text-center font-bold">
+            {step === 'record' && t('voiceAuth.verify.title', { defaultValue: 'Confirmez votre voix' })}
             {step === 'processing' && t('voiceAuth.verify.processing', { defaultValue: 'Vérification en cours...' })}
             {step === 'success' && t('voiceAuth.verify.success', { defaultValue: 'Identité confirmée !' })}
             {step === 'failed' && t('voiceAuth.verify.errors.voiceNotRecognized', { defaultValue: 'Voix non reconnue' })}
           </CardTitle>
+          {(step === 'processing' || step === 'success' || step === 'failed') && (
           <CardDescription className="text-center">
-            {step === 'record' && t('voiceAuth.verify.instruction', { defaultValue: 'Dites votre prénom et nom' })}
             {step === 'processing' && t('voiceAuth.verify.processing', { defaultValue: 'Veuillez patienter' })}
             {step === 'success' && t('voiceAuth.verify.redirecting', { defaultValue: 'Redirection en cours...' })}
             {step === 'failed' && t('voiceAuth.verify.retry', { defaultValue: 'Veuillez réessayer' })}
           </CardDescription>
+          )}
         </CardHeader>
 
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-2">
           {/* Info utilisateur */}
-          {voiceUser && step !== 'success' && (
-            <div className="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg">
-              <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
-                <User className="h-5 w-5 text-primary-600" />
+          {voiceUser && step === 'record' && (
+            <div className="flex items-center gap-3 p-4 bg-gradient-to-br from-blue-50 to-primary-50 rounded-xl border border-blue-200/50">
+              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                <User className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <p className="font-medium text-neutral-900">
+                <p className="font-semibold text-neutral-900 text-base">
                   {voiceUser.prenom} {voiceUser.name}
                 </p>
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs text-neutral-600 mt-0.5">
                   {t('voiceAuth.verify.enrolledAt', { defaultValue: 'Inscrit le' })} {new Date(voiceUser.enrolledAt).toLocaleDateString('fr-FR')}
                 </p>
               </div>
@@ -204,59 +205,138 @@ function VoiceVerify() {
           )}
 
           {/* Erreur globale */}
-          {error && (
+          {(error || recordingError) && (
             <div className="p-3 rounded-lg bg-error-50 border border-error-200 flex items-start gap-2">
               <AlertCircle className="h-5 w-5 text-error-500 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-error-700">{error}</p>
+              <p className="text-sm text-error-700">
+                {error || t('voiceAuth.verify.errors.generic', { defaultValue: 'Une erreur est survenue. Veuillez réessayer.' })}
+              </p>
             </div>
           )}
 
           {/* Étape 1 : Enregistrement */}
           {step === 'record' && (
-            <div className="flex flex-col items-center space-y-6">
+            <div className="flex flex-col items-center space-y-8">
               {/* Indicateur de durée */}
               <div className="text-center">
-                <p className="text-3xl font-mono font-bold text-neutral-900">
+                <p className={`text-4xl font-mono font-bold transition-colors duration-300 ${
+                  isRecording ? 'text-red-600' : 'text-neutral-900'
+                }`}>
                   {formatDuration(duration)}
                 </p>
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs text-neutral-500 mt-1">
                   max {formatDuration(maxDuration)}
                 </p>
               </div>
 
-              {/* Bouton d'enregistrement */}
-              <button
-                onClick={isRecording ? stopRecording : startRecording}
-                className={`
-                  w-24 h-24 rounded-full flex items-center justify-center
-                  transition-all duration-300 shadow-lg
-                  ${isRecording 
-                    ? 'bg-error-500 hover:bg-error-600 animate-pulse' 
-                    : 'bg-primary-600 hover:bg-primary-700'
-                  }
-                `}
-              >
-                {isRecording ? (
-                  <MicOff className="h-10 w-10 text-white" />
-                ) : (
-                  <Mic className="h-10 w-10 text-white" />
+              {/* Bouton d'enregistrement avec animation de vagues */}
+              <div className="relative flex items-center justify-center">
+                {/* Cercle animé autour du bouton quand on enregistre */}
+                {isRecording && (
+                  <>
+                    <div className="absolute w-32 h-32 rounded-full bg-red-500/20 animate-ping" />
+                    <div className="absolute w-28 h-28 rounded-full bg-red-500/30 animate-pulse" />
+                  </>
                 )}
+                
+              <button
+                  onClick={async () => {
+                    if (isRecording) {
+                      stopRecording();
+                    } else {
+                      const result = await startRecording();
+                      if (!result.success && result.error) {
+                        setError(t('voiceAuth.verify.errors.microphoneDenied', { defaultValue: 'Impossible de démarrer l\'enregistrement. Vérifiez les permissions du micro.' }));
+                      }
+                    }
+                  }}
+                  disabled={recordingError && !isRecording}
+                className={`
+                    relative w-28 h-28 rounded-full flex items-center justify-center overflow-hidden
+                    transition-all duration-300 shadow-xl z-10
+                  ${isRecording 
+                      ? 'bg-red-500 hover:bg-red-600 scale-110 ring-4 ring-red-500/50' 
+                      : 'bg-blue-600 hover:bg-blue-700 hover:scale-105'
+                    }
+                    ${recordingError && !isRecording ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                    transform
+                  `}
+                >
+                  {/* Animation de vagues basée sur le volume */}
+                  {isRecording && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      {[...Array(3)].map((_, i) => {
+                        const baseSize = 28;
+                        const waveSize = baseSize + (volume * 50) * (1 + i * 0.4);
+                        const baseOpacity = 0.4 - (i * 0.15);
+                        const dynamicOpacity = baseOpacity + (volume * 0.3);
+                        return (
+                          <div
+                            key={i}
+                            className="absolute rounded-full border-2 border-white"
+                            style={{
+                              width: `${waveSize}px`,
+                              height: `${waveSize}px`,
+                              opacity: Math.max(0.1, Math.min(0.7, dynamicOpacity)),
+                              transform: `translate(-50%, -50%) scale(${1 + volume * 0.4})`,
+                              left: '50%',
+                              top: '50%',
+                              transition: 'all 0.05s ease-out',
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                  )}
+                  
+                  {/* Icône microphone */}
+                  <div className="relative z-10">
+                {isRecording ? (
+                      <MicOff className="h-12 w-12 text-white" style={{ 
+                        transform: `scale(${1 + volume * 0.1})`,
+                        transition: 'transform 0.1s ease-out'
+                      }} />
+                ) : (
+                      <Mic className="h-12 w-12 text-white" />
+                )}
+                  </div>
               </button>
+              </div>
 
-              <p className="text-sm text-neutral-600 text-center">
-                {isRecording 
-                  ? t('voiceAuth.verify.instruction', { defaultValue: 'Dites votre prénom et nom, puis appuyez pour arrêter' })
-                  : t('voiceAuth.verify.instruction', { defaultValue: 'Appuyez pour commencer' })
-                }
-              </p>
+              {/* Indicateur visuel d'enregistrement */}
+              {isRecording && (
+                <div className="flex items-center gap-2 text-red-600">
+                  <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                  <p className="text-sm font-medium">
+                    {t('voiceAuth.verify.recording', { defaultValue: 'Enregistrement en cours...' })}
+                  </p>
+                </div>
+              )}
+
+              {/* Exemple */}
+              <div className="bg-gradient-to-br from-blue-50 to-primary-50 p-5 rounded-xl w-full border-2 border-blue-200/50 shadow-sm">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                  <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide">
+                    {t('voiceAuth.verify.exampleLabel', { defaultValue: 'Exemple' })}
+                  </p>
+                  <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                </div>
+                <p className="text-base font-medium text-neutral-800 text-center">
+                  "{t('voiceAuth.verify.example', { defaultValue: 'Mouhamed Ndiaye' })}"
+                </p>
+              </div>
             </div>
           )}
 
           {/* Étape 2 : Traitement */}
           {step === 'processing' && (
-            <div className="flex flex-col items-center space-y-4 py-8">
-              <Loader2 className="h-12 w-12 text-primary-600 animate-spin" />
-              <p className="text-sm text-neutral-600">
+            <div className="flex flex-col items-center space-y-4 py-12">
+              <div className="relative">
+                <Loader2 className="h-16 w-16 text-primary-600 animate-spin" />
+                <div className="absolute inset-0 rounded-full border-4 border-primary-100" />
+              </div>
+              <p className="text-base text-neutral-700 font-medium">
                 {t('voiceAuth.verify.processing', { defaultValue: 'Comparaison de votre voix...' })}
               </p>
             </div>
@@ -297,32 +377,14 @@ function VoiceVerify() {
         </CardContent>
       </Card>
 
-      {/* Affichage des erreurs d'enregistrement */}
-      {(error || recordingError) && step !== 'failed' && (
-        <div className="mt-4 p-3 rounded-lg bg-error-50 border border-error-200 flex items-start gap-2">
-          <AlertCircle className="h-5 w-5 text-error-500 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-error-700">
-            {error || recordingError?.message || t('voiceAuth.verify.errors.recordingFailed', { defaultValue: 'Erreur lors de l\'enregistrement' })}
-          </p>
-        </div>
-      )}
-
-      {/* Liens */}
-      <div className="mt-6 flex gap-4">
+      {/* Lien retour */}
+      <div className="mt-6">
         <Button
           variant="ghost"
           onClick={() => navigate('/welcome')}
         >
-          ← {t('buttons.back', { defaultValue: 'Retour' })}
-        </Button>
-        {step !== 'success' && (
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/voice-enroll')}
-          >
-            {t('welcome.startVoiceSignup', { defaultValue: 'Nouvelle inscription' })}
+          ← Retour
           </Button>
-        )}
       </div>
     </div>
   );

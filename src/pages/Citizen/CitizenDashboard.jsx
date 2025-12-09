@@ -118,14 +118,14 @@ function CitizenDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 py-6 px-4">
+    <div className="min-h-screen py-6 px-4">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-neutral-900 mb-2">
+          <h1 className="text-3xl font-bold text-white mb-2">
             {t('citizen.dashboard.title', { defaultValue: 'Mes signalements' })}
           </h1>
-          <p className="text-neutral-600">
+          <p className="text-neutral-300">
             {t('citizen.dashboard.subtitle', {
               defaultValue: 'Consultez l\'historique et le statut de vos signalements',
             })}
@@ -194,7 +194,7 @@ function CitizenDashboard() {
 
         {/* Liste des signalements */}
         <section>
-          <h2 className="text-xl font-semibold text-neutral-900 mb-4">
+          <h2 className="text-xl font-semibold text-white mb-4">
             {t('citizen.dashboard.reports_title', { defaultValue: 'Historique' })}
           </h2>
           {loading ? (

@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { CheckCircle, Map, FileText } from 'lucide-react';
+import { CheckCircle, FileText } from 'lucide-react';
 import Confetti from 'react-confetti';
 import {
   Dialog,
@@ -53,19 +53,11 @@ function SuccessModal({ open, onClose, report, autoRedirect = false }) {
     }
   }, [open, autoRedirect, navigate]);
 
-  const handleViewMap = () => {
-    onClose();
-    // Petit délai pour laisser le Dialog se fermer avant la navigation
-    setTimeout(() => {
-      navigate('/carte');
-    }, 50);
-  };
-
   const handleViewDashboard = () => {
     onClose();
     // Petit délai pour laisser le Dialog se fermer avant la navigation
     setTimeout(() => {
-      navigate('/citizen/dashboard');
+    navigate('/citizen/dashboard');
     }, 50);
   };
 
@@ -82,41 +74,32 @@ function SuccessModal({ open, onClose, report, autoRedirect = false }) {
         />
       )}
 
-      <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-md">
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
           <div className="flex flex-col items-center justify-center py-8 space-y-8">
             {/* Grand checkmark animé */}
             <div className="relative">
               <div className="w-32 h-32 bg-green-100 rounded-full flex items-center justify-center animate-bounce">
                 <CheckCircle className="w-20 h-20 text-green-600" strokeWidth={2.5} />
-              </div>
+            </div>
               {/* Effet de pulse autour */}
               <div className="absolute inset-0 w-32 h-32 bg-green-200 rounded-full animate-ping opacity-30" />
             </div>
 
-            {/* Boutons de navigation */}
-            <div className="flex flex-col gap-3 w-full">
-              <Button
-                onClick={handleViewDashboard}
-                className="w-full"
+            {/* Bouton de navigation */}
+            <div className="w-full">
+          <Button
+            onClick={handleViewDashboard}
+            className="w-full"
                 size="lg"
-              >
-                <FileText className="w-4 h-4 mr-2" />
+          >
+            <FileText className="w-4 h-4 mr-2" />
                 {t('success.view_dashboard', { defaultValue: 'Mes signalements' })}
-              </Button>
-
-              <Button
-                onClick={handleViewMap}
-                variant="outline"
-                className="w-full"
-              >
-                <Map className="w-4 h-4 mr-2" />
-                {t('success.view_map', { defaultValue: 'Carte' })}
-              </Button>
-            </div>
+            </Button>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </DialogContent>
+    </Dialog>
     </>
   );
 }

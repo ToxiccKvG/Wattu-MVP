@@ -1,11 +1,10 @@
 
 import { useEffect } from 'react';
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/context/LangContext';
-import { Settings } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 import Logo from '@/components/shared/Logo';
-import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
 import BottomNavigation from '@/components/shared/BottomNavigation';
 
 /**
@@ -13,7 +12,7 @@ import BottomNavigation from '@/components/shared/BottomNavigation';
  * 
  * Rôle :
  * - Wrapper commun pour toutes les pages accessibles sans authentification
- * - Affiche le header avec LanguageSwitcher (FR/Wolof)
+ * - Affiche le header avec logo et bouton de déconnexion
  * - Restaure la langue sauvegardée du citoyen (si vient d'une page forcée en FR)
  * 
  * Utilisé pour :
@@ -21,9 +20,9 @@ import BottomNavigation from '@/components/shared/BottomNavigation';
  * - Autres pages publiques futures
  * 
  * Design :
- * - Header fixe en haut (avec logo + LanguageSwitcher)
- * - Zone de contenu principale (Outlet pour React Router)
- * - Footer simple (optionnel)
+ * - Header fixe en haut (avec logo + bouton déconnexion)
+ * - Zone de contenu principale avec fond sombre (Outlet pour React Router)
+ * - Bottom navigation (mobile)
  * - Mobile-first responsive
  * 
  * Usage :
@@ -38,6 +37,8 @@ function PublicLayout() {
   
   const { t } = useTranslation();
   const { restoreLanguage } = useLanguage();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   // ═══════════════════════════════════════════════════════════
   // EFFETS
@@ -58,28 +59,30 @@ function PublicLayout() {
   // ═══════════════════════════════════════════════════════════
 
   return (
-    <div className="min-h-screen flex flex-col bg-neutral-50">
+    <div className="min-h-screen flex flex-col bg-black">
       {/* ═══════════════════════════════════════════════════════════
           HEADER
           ═══════════════════════════════════════════════════════════ */}
-      <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-          {/* Logo WattU */}
-          <Logo size="md" linkTo="/home" />
+      <header className="sticky top-0 z-50 w-full border-b bg-black shadow-sm">
+        <div className="container mx-auto flex flex-row items-center justify-start relative py-0.5 md:py-1 px-4 md:px-6">
+          {/* Logo WattU - À gauche */}
+          <Logo size="xl" linkTo="/home" />
 
-          {/* Right side: Settings + Language Switcher */}
-          <div className="flex items-center gap-3">
-            {/* Paramètres */}
-            <Link
-              to="/parametres"
-              className="p-2 rounded-lg text-neutral-600 hover:text-primary-600 hover:bg-primary-50 transition-colors"
-              aria-label={t('nav.settings', { defaultValue: 'Paramètres' })}
+          {/* Right side: Déconnexion - Aligné avec le logo */}
+          <div className="absolute right-4 md:right-6 flex items-center gap-3 top-[80%] -translate-y-1/2">
+            {/* Déconnexion */}
+            <button
+              onClick={async () => {
+                const result = await logout('fr');
+                if (result.success) {
+                  navigate('/welcome');
+                }
+              }}
+              className="px-4 py-2.5 rounded-lg text-base font-medium text-white bg-red-500 hover:bg-red-600 shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
+              aria-label={t('nav.logout', { defaultValue: 'Déconnexion' })}
             >
-              <Settings className="w-5 h-5" />
-            </Link>
-
-            {/* Language Switcher */}
-            <LanguageSwitcher />
+              {t('nav.logout', { defaultValue: 'Déconnexion' })}
+            </button>
           </div>
         </div>
       </header>
@@ -87,42 +90,10 @@ function PublicLayout() {
       {/* ═══════════════════════════════════════════════════════════
           MAIN CONTENT
           ═══════════════════════════════════════════════════════════ */}
-      <main className="flex-1 container mx-auto px-4 py-6 md:px-6 md:py-8 pb-20">
+      <main className="flex-1 container mx-auto px-4 py-6 md:px-6 md:py-8 pb-20 bg-black">
         {/* React Router rend le composant de la route ici */}
         <Outlet />
       </main>
-
-      {/* ═══════════════════════════════════════════════════════════
-          FOOTER
-          ═══════════════════════════════════════════════════════════ */}
-      <footer className="border-t bg-white py-6 mb-16">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            {/* Copyright */}
-            <p className="text-sm text-neutral-600">
-              © 2025 WattU. {t('footer.rights', { defaultValue: 'Tous droits réservés.' })}
-            </p>
-
-            {/* Links (optionnel pour MVP) */}
-            <div className="flex gap-4 text-sm text-neutral-600">
-              <a 
-                href="#" 
-                className="hover:text-primary-600 transition-colors"
-                aria-label={t('footer.about', { defaultValue: 'À propos' })}
-              >
-                {t('footer.about', { defaultValue: 'À propos' })}
-              </a>
-              <a 
-                href="#" 
-                className="hover:text-primary-600 transition-colors"
-                aria-label={t('footer.contact', { defaultValue: 'Contact' })}
-              >
-                {t('footer.contact', { defaultValue: 'Contact' })}
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
 
       {/* ═══════════════════════════════════════════════════════════
           BOTTOM NAVIGATION (MOBILE)

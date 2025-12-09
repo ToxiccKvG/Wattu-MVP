@@ -31,7 +31,11 @@ function GlobalStats({ stats }) {
       icon: FileText,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-200'
+      borderColor: 'border-blue-200',
+      gradient: 'from-blue-50/50 via-white to-cyan-50/30',
+      headerGradient: 'from-blue-50 to-transparent',
+      headerBorder: 'border-blue-200/30',
+      titleColor: 'text-blue-900'
     },
     {
       title: t('stats.pending', { defaultValue: 'En Attente' }),
@@ -39,7 +43,11 @@ function GlobalStats({ stats }) {
       icon: Clock,
       color: 'text-yellow-600',
       bgColor: 'bg-yellow-50',
-      borderColor: 'border-yellow-200'
+      borderColor: 'border-yellow-200',
+      gradient: 'from-yellow-50/50 via-white to-amber-50/30',
+      headerGradient: 'from-yellow-50 to-transparent',
+      headerBorder: 'border-yellow-200/30',
+      titleColor: 'text-yellow-900'
     },
     {
       title: t('stats.in_progress', { defaultValue: 'En Cours' }),
@@ -47,7 +55,11 @@ function GlobalStats({ stats }) {
       icon: AlertCircle,
       color: 'text-orange-600',
       bgColor: 'bg-orange-50',
-      borderColor: 'border-orange-200'
+      borderColor: 'border-orange-200',
+      gradient: 'from-orange-50/50 via-white to-red-50/30',
+      headerGradient: 'from-orange-50 to-transparent',
+      headerBorder: 'border-orange-200/30',
+      titleColor: 'text-orange-900'
     },
     {
       title: t('stats.resolved', { defaultValue: 'Résolus' }),
@@ -55,7 +67,11 @@ function GlobalStats({ stats }) {
       icon: CheckCircle,
       color: 'text-green-600',
       bgColor: 'bg-green-50',
-      borderColor: 'border-green-200'
+      borderColor: 'border-green-200',
+      gradient: 'from-green-50/50 via-white to-emerald-50/30',
+      headerGradient: 'from-green-50 to-transparent',
+      headerBorder: 'border-green-200/30',
+      titleColor: 'text-green-900'
     },
     {
       title: t('stats.rejected', { defaultValue: 'Rejetés' }),
@@ -63,7 +79,11 @@ function GlobalStats({ stats }) {
       icon: XCircle,
       color: 'text-red-600',
       bgColor: 'bg-red-50',
-      borderColor: 'border-red-200'
+      borderColor: 'border-red-200',
+      gradient: 'from-red-50/50 via-white to-rose-50/30',
+      headerGradient: 'from-red-50 to-transparent',
+      headerBorder: 'border-red-200/30',
+      titleColor: 'text-red-900'
     }
   ];
 
@@ -75,25 +95,25 @@ function GlobalStats({ stats }) {
         return (
           <Card
             key={index}
-            className={`border-2 ${card.borderColor} hover:shadow-lg transition-shadow duration-200`}
+            className={`bg-gradient-to-br ${card.gradient} border-2 ${card.borderColor}/50 hover:shadow-lg transition-all duration-200 shadow-md`}
           >
-            <CardHeader className="pb-3">
+            <CardHeader className={`pb-3 bg-gradient-to-r ${card.headerGradient} border-b ${card.headerBorder}`}>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-neutral-600">
+                <CardTitle className={`text-sm font-medium ${card.titleColor}`}>
                   {card.title}
                 </CardTitle>
-                <div className={`p-2 rounded-lg ${card.bgColor}`}>
+                <div className={`p-2 rounded-lg ${card.bgColor} shadow-sm`}>
                   <Icon className={`w-5 h-5 ${card.color}`} />
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-4">
               <div className="text-3xl font-bold text-neutral-900">
                 {card.value.toLocaleString('fr-FR')}
               </div>
               {/* Optionnel: Pourcentage vs total */}
               {index > 0 && stats.total > 0 && (
-                <p className="text-xs text-neutral-500 mt-1">
+                <p className={`text-xs ${card.titleColor} mt-2 font-medium bg-white/50 px-2 py-1 rounded-lg border ${card.borderColor}/30 inline-block`}>
                   {Math.round((card.value / stats.total) * 100)}% du total
                 </p>
               )}
