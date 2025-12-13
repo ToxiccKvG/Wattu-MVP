@@ -2,6 +2,8 @@
 
 **Plateforme de signalement citoyen pour améliorer les services publics au Sénégal**
 
+### 🎥 Démo Vidéo
+📺 [Voir la démonstration sur YouTube](https://youtu.be/-BGzReowc_k)
 
 ---
 

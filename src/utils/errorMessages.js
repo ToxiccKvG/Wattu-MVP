@@ -18,7 +18,7 @@ export const authErrorMessages = {
   // Erreur de credentials invalides
   'Invalid login credentials': {
     fr: 'Email ou mot de passe incorrect',
-    wo: 'Email walla mot de passe dañu xamul',
+    wo: 'Email walla mot de passe bi baxoul ',
   },
 
   // User introuvable (on donne le MÊME message que credentials invalides pour la sécurité)
