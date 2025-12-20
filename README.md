@@ -2,12 +2,12 @@
 
 **Plateforme de signalement citoyen pour améliorer les services publics au Sénégal**
 
-### 🎥 Démo Vidéo
-📺 [Voir la démonstration sur YouTube](https://youtu.be/-BGzReowc_k)
+### Démo Vidéo
+[Voir la démonstration sur YouTube](https://youtu.be/-BGzReowc_k)
 
 ---
 
-## 📋 Table des Matières
+## Table des Matières
 
 - [À propos](#-à-propos)
 - [Fonctionnalités](#-fonctionnalités)
@@ -23,50 +23,50 @@
 
 ---
 
-## 🌍 À propos
+## À propos
 
 **WattU** est une plateforme web progressive (PWA) permettant aux citoyens de signaler des problèmes dans leur commune (pannes électriques, fuites d'eau, nids-de-poule, etc.) en temps réel, tout en donnant aux agents municipaux et administrateurs les outils pour gérer et résoudre ces signalements efficacement.
 
-### 🎯 Objectifs
+### Objectifs
 - **Citoyens** : Signaler des problèmes facilement, suivre leur évolution
 - **Agents** : Gérer les signalements de leur commune, définir des priorités
 - **Administrateurs** : Vue d'ensemble nationale, analytics, gestion des communes
 
-### 🗣️ Langues
+### Langues
 - **Français** (interface principale)
 - **Wolof** (interface citoyenne accessible)
 
 ---
 
-## ✨ Fonctionnalités
+## Fonctionnalités
 
 ### Pour les Citoyens (Public)
-- ✅ **Création de signalements** sans compte requis
-- 📸 **Upload de photos** avec compression automatique
-- 🗺️ **Géolocalisation GPS** ou sélection manuelle sur carte
-- 🗺️ **Carte interactive** pour visualiser tous les signalements
-- 🌐 **Multilingue** : Français / Wolof
-- 📱 **Progressive Web App** : Installation sur mobile/desktop
+- **Création de signalements** sans compte requis
+- **Upload de photos** avec compression automatique
+- **Géolocalisation GPS** ou sélection manuelle sur carte
+- **Carte interactive** pour visualiser tous les signalements
+- **Multilingue** : Français / Wolof
+- **Progressive Web App** : Installation sur mobile/desktop
 
 ### Pour les Agents (Authentifiés)
-- 🔒 **Connexion sécurisée** (email/mot de passe)
-- 📊 **Dashboard** avec statistiques en temps réel
-- 📋 **Gestion des signalements** de leur commune uniquement
-- 🔄 **Mise à jour de statuts** (en attente → en cours → résolu/rejeté)
-- ⚡ **Définition de priorités** (basse, normale, haute, urgente)
-- 🗺️ **Carte des signalements** de la commune
-- 📤 **Export CSV** des données
+- **Connexion sécurisée** (email/mot de passe)
+- **Dashboard** avec statistiques en temps réel
+- **Gestion des signalements** de leur commune uniquement
+- **Mise à jour de statuts** (en attente → en cours → résolu/rejeté)
+- **Définition de priorités** (basse, normale, haute, urgente)
+- **Carte des signalements** de la commune
+- **Export CSV** des données
 
 ### Pour les Administrateurs
-- 🌐 **Vue globale** de tous les signalements (toutes communes)
-- 📈 **Analytics avancés** : statistiques, tendances, top communes
-- 📊 **Graphiques** d'évolution sur 30 jours
-- 🏛️ **Gestion multi-communes**
-- 📤 **Export CSV avancé** avec colonnes sélectionnables
+- **Vue globale** de tous les signalements (toutes communes)
+- **Analytics avancés** : statistiques, tendances, top communes
+- **Graphiques** d'évolution sur 30 jours
+- **Gestion multi-communes**
+- **Export CSV avancé** avec colonnes sélectionnables
 
 ---
 
-## 🛠️ Stack Technique
+## Stack Technique
 
 ### Frontend
 - **React 19** - Interface utilisateur
@@ -95,7 +95,7 @@
 
 ---
 
-## 📦 Prérequis
+## Prérequis
 
 Avant de commencer, assurez-vous d'avoir :
 
@@ -106,7 +106,7 @@ Avant de commencer, assurez-vous d'avoir :
 
 ---
 
-## 🚀 Installation
+## Installation
 
 ### 1. Cloner le projet
 
@@ -123,7 +123,7 @@ npm install
 
 
 
-## 💻 Développement
+## Développement
 
 ### Lancer le serveur de développement
 
@@ -164,7 +164,7 @@ Pour vous connecter aux sections Agent et Admin vous devrais taper dans l'url /l
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ### Structure du projet
 
